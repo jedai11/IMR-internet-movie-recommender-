@@ -397,101 +397,91 @@ export function App() {
         <ConsentNotice onOpenPrivacyModal={() => setPrivacyModalOpen(true)} />
       </div>
 
-      {/* Glassmorphic Navigation Header */}
-      <header className="glass-light-header sticky top-0 z-40 theme-transition">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-md transition-all duration-700"
-              style={{
-                background: `linear-gradient(135deg, ${currentTheme.primaryHex}, ${currentTheme.secondaryHex})`,
-                boxShadow: `0 4px 16px ${currentTheme.glowHex}`
-              }}
-            >
-              <Clapperboard className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="font-black text-lg tracking-tight text-[#F8FAFC]">
-                MoodReel
-              </span>
-              <span
-                className="hidden sm:inline-block ml-2 text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full border transition-all duration-700 shadow-sm"
-                style={{
-                  backgroundColor: currentTheme.badgeBg,
-                  borderColor: currentTheme.badgeBorder,
-                  color: currentTheme.badgeText
-                }}
-              >
-                Affective Cinema
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Gemini Integration Badge */}
-            <div
-              className="glass-light-pill px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 text-emerald-400 border-[#29344D]"
-              title="Google Gemini AI is active for affective psychology NLP and movie genre analysis"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-              <span className="hidden sm:inline font-mono text-[11px]">Gemini AI Active</span>
-            </div>
-
-            {/* Dynamic Mood Palette Swatch Indicator with WCAG Compliance Tag */}
-            <div
-              className="glass-light-pill px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-2 transition-all duration-700 shadow-sm border-[#29344D]"
-              style={{
-                borderColor: currentTheme.badgeBorder,
-                color: '#F8FAFC'
-              }}
-              title={`${currentTheme.name}: ${currentTheme.feeling} • WCAG 2.2 ${currentTheme.wcagLevel} compliant (${currentTheme.contrastRatioOnLight})`}
-            >
-              <div className="flex items-center -space-x-1">
-                <span
-                  className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
-                  style={{ backgroundColor: currentTheme.primaryHex }}
-                  title={`Primary: ${currentTheme.primaryHex}`}
-                />
-                <span
-                  className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
-                  style={{ backgroundColor: currentTheme.secondaryHex }}
-                  title={`Secondary: ${currentTheme.secondaryHex}`}
-                />
-                <span
-                  className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
-                  style={{ backgroundColor: currentTheme.accentHex }}
-                  title={`Accent: ${currentTheme.accentHex}`}
-                />
-              </div>
-              <span className="hidden md:inline font-mono text-[11px] text-[#F8FAFC]">{currentTheme.name}</span>
-              <span className="hidden lg:inline-block px-1.5 py-0.5 rounded-md bg-emerald-950/80 text-emerald-300 text-[9px] font-mono font-black border border-emerald-600/50">
-                WCAG {currentTheme.wcagLevel}
-              </span>
-            </div>
-
-            <button
-              onClick={() => setPrivacyModalOpen(true)}
-              className="glass-light-pill px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D] transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="hidden sm:inline">Privacy</span>
-            </button>
-
-            {recommendations.length > 0 && (
-              <button
-                onClick={handleClearSession}
-                title="Reset discovery session"
-                className="glass-light-pill p-2 rounded-xl text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D] transition cursor-pointer"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+      {/* Left Exterior Brand: IMR */}
+      <div className="fixed top-4 left-4 sm:left-6 z-40 flex items-center gap-2.5 pointer-events-auto">
+        <div
+          className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-700"
+          style={{
+            background: `linear-gradient(135deg, ${currentTheme.primaryHex}, ${currentTheme.secondaryHex})`,
+            boxShadow: `0 4px 18px ${currentTheme.glowHex}`
+          }}
+        >
+          <Clapperboard className="w-5 h-5 text-white" />
         </div>
-      </header>
+        <div className="flex flex-col">
+          <span className="font-black text-2xl tracking-tight text-[#F8FAFC] leading-none">
+            IMR
+          </span>
+          <span className="text-[10px] uppercase tracking-wider font-bold text-cyan-300/80 mt-0.5">
+            Internet Movie Recommender
+          </span>
+        </div>
+      </div>
+
+      {/* Floating Top-Right Exterior Utility Cluster */}
+      <div className="fixed top-4 right-4 sm:right-6 z-40 flex items-center gap-2 pointer-events-auto">
+        {/* Gemini AI Status Badge */}
+        <div
+          className="glass-light-pill px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 text-emerald-400 border-[#29344D]"
+          title="Google Gemini AI is active for affective psychology NLP and movie genre analysis"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+          <span className="hidden sm:inline font-mono text-[11px]">Gemini AI</span>
+        </div>
+
+        {/* Dynamic Mood Palette Swatch Indicator with WCAG Compliance Tag */}
+        <div
+          className="glass-light-pill px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all duration-700 shadow-sm border-[#29344D]"
+          style={{
+            borderColor: currentTheme.badgeBorder,
+            color: '#F8FAFC'
+          }}
+          title={`${currentTheme.name}: ${currentTheme.feeling} • WCAG 2.2 ${currentTheme.wcagLevel} compliant (${currentTheme.contrastRatioOnLight})`}
+        >
+          <div className="flex items-center -space-x-1">
+            <span
+              className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
+              style={{ backgroundColor: currentTheme.primaryHex }}
+              title={`Primary: ${currentTheme.primaryHex}`}
+            />
+            <span
+              className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
+              style={{ backgroundColor: currentTheme.secondaryHex }}
+              title={`Secondary: ${currentTheme.secondaryHex}`}
+            />
+            <span
+              className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
+              style={{ backgroundColor: currentTheme.accentHex }}
+              title={`Accent: ${currentTheme.accentHex}`}
+            />
+          </div>
+          <span className="hidden md:inline font-mono text-[11px] text-[#F8FAFC]">{currentTheme.name}</span>
+          <span className="hidden lg:inline-block px-1.5 py-0.5 rounded-md bg-emerald-950/80 text-emerald-300 text-[9px] font-mono font-black border border-emerald-600/50">
+            WCAG {currentTheme.wcagLevel}
+          </span>
+        </div>
+
+        <button
+          onClick={() => setPrivacyModalOpen(true)}
+          className="glass-light-pill px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D] transition flex items-center gap-1.5 cursor-pointer"
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+          <span className="hidden sm:inline">Privacy</span>
+        </button>
+
+        {recommendations.length > 0 && (
+          <button
+            onClick={handleClearSession}
+            title="Reset discovery session"
+            className="glass-light-pill p-2 rounded-xl text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D] transition cursor-pointer"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+        )}
+      </div>
 
       {/* Main Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-10 space-y-12 relative z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-12 space-y-12 relative z-10">
         
         {/* ========================================================================= */}
         {/* CENTER HERO SEARCH CAPSULE (Glass-Light Morphism)                        */}

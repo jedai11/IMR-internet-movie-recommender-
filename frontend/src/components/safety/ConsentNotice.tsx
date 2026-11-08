@@ -18,7 +18,7 @@ export const ConsentNotice: React.FC<Props> = ({ onOpenPrivacyModal }) => {
           Designed with Privacy in Mind
         </span>
         <span className="font-medium text-[#CBD5E1]">
-          MoodReel processes emotional affect solely to match movies against your stated mood. Zero biometric tracking or surveillance.
+          IMR processes emotional affect solely to match movies against your stated mood. Zero biometric tracking or surveillance.
         </span>
         <button
           onClick={onOpenPrivacyModal}
