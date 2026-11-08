@@ -1,0 +1,11 @@
+{
+  "name": "movie-recommendation-system",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build"
+  },
+  "dependencies": {
+    "@google/genai": "^3.0.0"
+  }
+}
