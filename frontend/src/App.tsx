@@ -556,8 +556,8 @@ export function App() {
               )}
             </div>
 
-            {/* Quick Action Ribbon */}
-            <div className="flex items-center justify-between flex-wrap gap-2 pt-3 border-t border-[#29344D]">
+            {/* Tool Toggles Ribbon */}
+            <div className="flex items-center justify-between flex-wrap gap-2.5 pt-3.5 border-t border-[#29344D]">
               <div className="flex items-center gap-2 flex-wrap">
                 {/* 2D Mood Canvas Toggle */}
                 <button
@@ -618,23 +618,29 @@ export function App() {
                   <span>Filters</span>
                 </button>
               </div>
+            </div>
 
-              {/* Primary Search / Discover Action Button (WCAG 2.2 Compliant Contrast) */}
+            {/* Dedicated Primary Discover Mode Action (Placed Lower) */}
+            <div className="pt-3 flex items-center justify-between flex-wrap gap-3">
+              <span className="text-xs text-[#CBD5E1]/60 hidden sm:inline-flex items-center gap-1.5 font-medium">
+                Tip: Press <kbd className="px-2 py-0.5 rounded-lg bg-[#1C2540] text-[11px] font-mono text-[#F8FAFC] border border-[#29344D] shadow-sm">Enter ↵</kbd> to initiate discovery
+              </span>
+
               <button
                 type="button"
                 onClick={() => handleDiscover()}
                 disabled={loading}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-2xl font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-95 ml-auto hover:brightness-110"
+                className="w-full sm:w-auto px-7 py-3 rounded-2xl font-black text-sm shadow-lg transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 cursor-pointer active:scale-95 ml-auto hover:brightness-110"
                 style={{
                   background: `linear-gradient(135deg, ${currentTheme.primaryHex}, ${currentTheme.secondaryHex})`,
                   color: currentTheme.wcagButtonText,
-                  boxShadow: `0 6px 22px ${currentTheme.glowHex}`
+                  boxShadow: `0 8px 26px ${currentTheme.glowHex}`
                 }}
               >
                 {loading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" style={{ color: currentTheme.wcagButtonText }} />
-                    <span>Analyzing Affect...</span>
+                    <span>Analyzing Affect & Catalog...</span>
                   </>
                 ) : (
                   <>
