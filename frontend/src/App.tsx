@@ -492,7 +492,7 @@ export function App() {
         {/* ========================================================================= */}
         {/* CENTER HERO SEARCH CAPSULE (Glass-Light Morphism)                        */}
         {/* ========================================================================= */}
-        <section className="max-w-3xl mx-auto space-y-8 text-center mt-2 sm:mt-4">
+        <section className="max-w-2xl mx-auto space-y-8 text-center mt-2 sm:mt-4">
           
           {/* Hero Headlines & Information */}
           <div className="space-y-3">
