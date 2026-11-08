@@ -392,11 +392,6 @@ export function App() {
         />
       </div>
 
-      {/* EU AI Act Art. 50 Notice Banner */}
-      <div className="relative z-50">
-        <ConsentNotice onOpenPrivacyModal={() => setPrivacyModalOpen(true)} />
-      </div>
-
       {/* Left Exterior Brand: IMR */}
       <div className="fixed top-4 left-4 sm:left-6 z-40 flex items-center gap-2.5 pointer-events-auto">
         <div
