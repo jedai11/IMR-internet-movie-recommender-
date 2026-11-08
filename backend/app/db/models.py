@@ -90,3 +90,36 @@ class EventLog(Base):
     returned_title_ids = Column(Text, nullable=True)
     latency_ms = Column(Integer, default=0)
     created_at = Column(DateTime, default=utc_now)
+
+class TMDBMovieQueue(Base):
+    """
+    FIFO Queue table for raw movies abstracted from TMDB awaiting ingestion.
+    Ensures structured, deduplicated queuing before catalog promotion.
+    """
+    __tablename__ = "tmdb_movie_queue"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    tmdb_id = Column(Integer, index=True, nullable=False)
+    title = Column(String, nullable=False)
+    genre_name = Column(String, nullable=False, index=True)
+    status = Column(String, default="QUEUED", index=True)  # QUEUED, PROCESSED, SKIPPED
+    payload_json = Column(Text, nullable=True)
+    queued_at = Column(DateTime, default=utc_now)
+    processed_at = Column(DateTime, nullable=True)
+
+class TMDBMovieStack(Base):
+    """
+    LIFO Stack table for active and historical recommended movie sequences.
+    Enables instant LIFO peek/pop retrieval for genres without repeat TMDB queries.
+    """
+    __tablename__ = "tmdb_movie_stack"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    session_id = Column(String, index=True, nullable=True)
+    title_id = Column(String, ForeignKey("titles.id"), nullable=False, index=True)
+    tmdb_id = Column(Integer, nullable=True)
+    genre_name = Column(String, nullable=False, index=True)
+    stack_order = Column(Integer, default=0, index=True)
+    pushed_at = Column(DateTime, default=utc_now)
+
+    title = relationship("MovieTitle")

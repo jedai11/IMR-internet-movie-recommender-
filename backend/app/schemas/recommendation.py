@@ -46,6 +46,10 @@ class MovieRecommendation(BaseModel):
     match_rationale: str
     front_page_description: Optional[str] = Field(default=None, description="Official theatrical front-page poster description verified by Gemini")
     safety_check: SafetyCheckResult
+    tmdb_rating: Optional[float] = Field(default=None, description="Official TMDB user rating out of 10")
+    vote_count: Optional[int] = Field(default=None, description="TMDB vote count")
+    backdrop_url: Optional[str] = Field(default=None, description="TMDB wide backdrop poster URL")
+    trailer_url: Optional[str] = Field(default=None, description="Official YouTube trailer URL")
 
 class RecommendationResponse(BaseModel):
     session_id: str

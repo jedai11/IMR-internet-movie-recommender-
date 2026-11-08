@@ -499,9 +499,6 @@ export function App() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#F8FAFC] drop-shadow-md">
               Discover Cinema Grounded in Your Mood
             </h1>
-            <p className="text-sm sm:text-base text-[#CBD5E1] max-w-xl mx-auto leading-relaxed font-medium">
-              Express your feelings, mention movies or dramas you love, or fine-tune your affective coordinates on Russell's Circumplex.
-            </p>
           </div>
 
           {/* Central Glassmorphic Search Bar Capsule */}

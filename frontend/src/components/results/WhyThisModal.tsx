@@ -91,7 +91,41 @@ export const WhyThisModal: React.FC<Props> = ({ movie, targetMood, onClose }) =>
           </p>
         </div>
 
-        {/* 3. Safety Check Verification */}
+        {/* 3. TMDB Verified Metrics & Official Trailer */}
+        {(movie.tmdb_rating || movie.trailer_url) && (
+          <div className="glass-light-inner rounded-2xl p-4 space-y-2 border-cyan-500/30 bg-cyan-950/20">
+            <div className="flex items-center justify-between text-xs font-bold text-[#F8FAFC]">
+              <span className="flex items-center gap-1.5 text-cyan-300">
+                <Sparkles className="w-4 h-4 text-cyan-400" />
+                The Movie Database (TMDB) Integration
+              </span>
+              {movie.tmdb_rating && (
+                <span className="text-amber-300 font-mono font-bold flex items-center gap-1">
+                  ⭐ {movie.tmdb_rating}/10
+                  {movie.vote_count ? (
+                    <span className="text-[10px] text-[#94A3B8]">({movie.vote_count.toLocaleString()} votes)</span>
+                  ) : null}
+                </span>
+              )}
+            </div>
+
+            {movie.trailer_url && (
+              <div className="pt-1">
+                <a
+                  href={movie.trailer_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2 px-3 rounded-xl bg-red-600/80 hover:bg-red-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md cursor-pointer"
+                >
+                  <Film className="w-3.5 h-3.5" />
+                  Watch Official Trailer (YouTube)
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 4. Safety Check Verification */}
         <div className="glass-light-inner rounded-2xl p-4 space-y-2 border-[#29344D]">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#F8FAFC]">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />

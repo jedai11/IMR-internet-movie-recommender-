@@ -82,6 +82,10 @@ export interface MovieRecommendation {
   match_rationale: string;
   front_page_description?: string;
   safety_check: SafetyCheckResult;
+  tmdb_rating?: number;
+  vote_count?: number;
+  backdrop_url?: string;
+  trailer_url?: string;
 }
 
 export interface RecommendationResponse {

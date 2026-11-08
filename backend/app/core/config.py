@@ -1,14 +1,18 @@
+import os
 from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DEFAULT_DB_PATH = os.path.join(BASE_DIR, "moodreel.db").replace("\\", "/")
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "MoodReel API"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api"
     
-    # Database
-    DATABASE_URL: str = "sqlite:///./moodreel.db"
+    # Database (Canonical absolute path to backend/moodreel.db)
+    DATABASE_URL: str = f"sqlite:///{DEFAULT_DB_PATH}"
     
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [
@@ -24,6 +28,10 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-3.5-flash"
     OPENAI_API_KEY: Optional[str] = None
     LLM_PROVIDER: str = "auto"  # 'gemini', 'openai', or 'heuristic'
+
+    # TMDB API configuration
+    TMDB_API_KEY: str = "554ae6544a5de71241de6bb3c8d7b96a"
+    TMDB_IMAGE_BASE_URL: str = "https://image.tmdb.org/t/p"
     
     # Weight Engine thresholds (Phase 1)
     COLD_START_THRESHOLD: int = 3

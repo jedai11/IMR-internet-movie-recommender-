@@ -54,10 +54,19 @@ export const MovieCard: React.FC<Props> = ({ movie, onOpenWhyThis, onFeedback })
             {movie.mood_compatibility.fit_percentage}% Match
           </div>
 
-          {/* Runtime */}
-          <div className="absolute bottom-3 left-3 text-[11px] font-semibold text-[#F8FAFC] bg-[#080B16]/80 backdrop-blur-md px-3 py-1 rounded-xl flex items-center gap-1.5 border border-[#29344D] shadow-md">
-            <Clock className="w-3.5 h-3.5 text-cyan-300" />
-            {movie.runtime_minutes}m • {movie.release_year}
+          {/* Runtime & TMDB Rating */}
+          <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
+            <div className="text-[11px] font-semibold text-[#F8FAFC] bg-[#080B16]/80 backdrop-blur-md px-3 py-1 rounded-xl flex items-center gap-1.5 border border-[#29344D] shadow-md">
+              <Clock className="w-3.5 h-3.5 text-cyan-300" />
+              {movie.runtime_minutes}m • {movie.release_year}
+            </div>
+            {movie.tmdb_rating && (
+              <div className="text-[11px] font-bold text-amber-300 bg-[#080B16]/85 backdrop-blur-md px-2.5 py-1 rounded-xl flex items-center gap-1 border border-amber-500/30 shadow-md">
+                <span>⭐</span>
+                <span>{movie.tmdb_rating}</span>
+                <span className="text-[9px] text-[#94A3B8]">TMDB</span>
+              </div>
+            )}
           </div>
         </div>
 

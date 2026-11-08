@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, AlertTriangle, Clock, Film, Tv, ShieldAlert, Globe } from 'lucide-react';
+import { Filter, Clock, Film, Tv, Globe } from 'lucide-react';
 import { FilterCriteria } from '../../types';
 
 interface Props {
@@ -23,15 +23,6 @@ const AVAILABLE_GENRES = [
   'Night-Movie', 'Romance', 'Sci-Fi', 'Thriller'
 ];
 
-const AVAILABLE_WARNINGS = [
-  { code: 'self_harm', label: 'Self-Harm / Suicide' },
-  { code: 'sexual_violence', label: 'Sexual Violence' },
-  { code: 'substance_abuse', label: 'Substance Abuse' },
-  { code: 'panic_attacks', label: 'Panic / Extreme Anxiety' },
-  { code: 'grief_loss', label: 'Grief / Loss of Loved One' },
-  { code: 'violence', label: 'Graphic Violence' }
-];
-
 const STREAMING_PLATFORMS = [
   { code: 'netflix', label: 'Netflix' },
   { code: 'prime', label: 'Prime Video' },
@@ -48,14 +39,6 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
       ? current.filter((g) => g !== genre)
       : [...current, genre];
     onChange({ ...filters, excluded_genres: next });
-  };
-
-  const toggleWarning = (warningCode: string) => {
-    const current = filters.excluded_warnings;
-    const next = current.includes(warningCode)
-      ? current.filter((w) => w !== warningCode)
-      : [...current, warningCode];
-    onChange({ ...filters, excluded_warnings: next });
   };
 
   const togglePlatform = (platform: string) => {
@@ -122,34 +105,7 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
         </div>
       </div>
 
-      {/* 2. Content Warnings */}
-      <div className="space-y-3">
-        <label className="text-xs font-bold text-[#F8FAFC] flex items-center gap-1.5">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-          Exclude Trigger Warnings
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {AVAILABLE_WARNINGS.map((w) => {
-            const isExcluded = filters.excluded_warnings.includes(w.code);
-            return (
-              <button
-                key={w.code}
-                onClick={() => toggleWarning(w.code)}
-                className={`p-3 rounded-2xl text-xs text-left border transition cursor-pointer flex items-center justify-between ${
-                  isExcluded
-                    ? 'glass-light-pill border-rose-500/50 text-rose-300 font-bold bg-rose-950/40 shadow-sm'
-                    : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D]'
-                }`}
-              >
-                <span>{w.label}</span>
-                {isExcluded && <span className="text-[10px] text-rose-400 font-black">EXCLUDED</span>}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 3. Genre Exclusions */}
+      {/* 2. Genre Exclusions */}
       <div className="space-y-3">
         <label className="text-xs font-bold text-[#F8FAFC] flex items-center gap-1.5">
           <Film className="w-3.5 h-3.5 text-[#CBD5E1]" />
@@ -233,14 +189,6 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
               </button>
             );
           })}
-        </div>
-      </div>
-
-      {/* Strict UNKNOWN Defense Notice */}
-      <div className="p-3.5 rounded-2xl glass-light-inner text-[11px] text-[#CBD5E1] flex items-start gap-2.5 border-[#29344D]">
-        <ShieldAlert className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-        <div>
-          <strong className="text-[#F8FAFC]">UNKNOWN-Metadata Defense Active:</strong> Titles missing verified trigger data are strictly excluded whenever any trigger filter is set.
         </div>
       </div>
     </div>

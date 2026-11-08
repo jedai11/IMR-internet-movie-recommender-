@@ -17,6 +17,8 @@ from app.core.filters import apply_hard_filters
 from app.core.weighting import get_recommendation_weights
 from app.core.ranking import rank_candidates
 from app.core.llm_service import llm_service
+from app.core.tmdb_service import tmdb_service
+from app.core.stack_queue_manager import stack_queue_manager
 
 router = APIRouter(prefix="/recommend", tags=["recommend"])
 
@@ -50,21 +52,29 @@ def get_recommendations(
             elif r.feedback_action in ("disliked", "thumbs_down"):
                 disliked_genre_names.update(g_names)
 
-    # 2. Query candidates from DB
+    # 2. Extract preferred genres (from semantics or explicit user preference)
+    preferred_genre_names = set(request.filters.preferred_genres) if request.filters and request.filters.preferred_genres else set()
+
+    # Dynamic TMDB Abstraction via FIFO Queue & DB Cache:
+    # When user asks for a genre, abstract from TMDB via Queue into DB once; subsequent queries reuse DB directly.
+    for g_name in preferred_genre_names:
+        try:
+            stack_queue_manager.abstract_genre_from_tmdb(genre_name=g_name, db=db, target_count=6)
+        except Exception as e:
+            pass
+
+    # 3. Query all candidates from DB (incorporating newly abstracted movies)
     all_candidates = db.query(MovieTitle).all()
 
-    # 3. Apply Hard Filters
+    # 4. Apply Hard Filters
     surviving_candidates, filter_audit = apply_hard_filters(
         candidates=all_candidates,
         filters=request.filters,
         seen_title_ids=seen_ids
     )
 
-    # 4. Weight Calculation (Cold-start vs. Established)
+    # 5. Weight Calculation (Cold-start vs. Established)
     weights = get_recommendation_weights(interaction_count=len(user_ratings))
-
-    # 5. Extract preferred genres (from semantics or explicit user preference)
-    preferred_genre_names = set(request.filters.preferred_genres) if request.filters and request.filters.preferred_genres else set()
 
     # 6. Deterministic Ranking
     ranked_tuples = rank_candidates(
@@ -106,6 +116,10 @@ def get_recommendations(
             synopsis=movie.synopsis,
             streaming_platforms=platforms,
             score=score,
+            tmdb_rating=tmdb_service.enrich_movie(movie.title, movie.release_year).get("vote_average"),
+            vote_count=tmdb_service.enrich_movie(movie.title, movie.release_year).get("vote_count"),
+            backdrop_url=tmdb_service.enrich_movie(movie.title, movie.release_year).get("backdrop_url"),
+            trailer_url=tmdb_service.enrich_movie(movie.title, movie.release_year).get("trailer_url"),
             mood_compatibility=MoodCompatibility(
                 title_valence=detail["title_valence"],
                 title_arousal=detail["title_arousal"],
@@ -121,6 +135,15 @@ def get_recommendations(
             )
         )
         top_recommendations.append(rec)
+
+        # Push to LIFO Stack for rapid retrieval and genre history tracking
+        primary_genre = genre_names[0] if genre_names else "General"
+        stack_queue_manager.push_to_lifo_stack(
+            title_id=movie.id,
+            genre_name=primary_genre,
+            session_id=request.session_id,
+            db=db
+        )
 
     latency_ms = int((time.time() - start_time) * 1000)
 
