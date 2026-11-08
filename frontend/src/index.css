@@ -191,6 +191,59 @@
     inset 0 1px 2px 0 rgba(255, 255, 255, 0.15);
 }
 
+/* ========================================================================= */
+/* IPHONE / iOS FROSTED GLASS-MORPHIC BUTTON SYSTEM                          */
+/* ========================================================================= */
+
+.ios-glass-button {
+  position: relative;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(28px) saturate(210%);
+  -webkit-backdrop-filter: blur(28px) saturate(210%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.35); /* iOS specular top edge highlight */
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.45),
+    0 2px 6px 0 rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.35), /* Crisp inner glass bevel reflection */
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.20);
+  color: #F8FAFC;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow, background-color;
+}
+
+.ios-glass-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  border-top-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 
+    0 14px 40px -4px rgba(0, 0, 0, 0.55),
+    0 0 24px 0 var(--mood-glow, rgba(0, 180, 216, 0.30)),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.50);
+  transform: translateY(-2px) scale(1.02);
+  color: #FFFFFF;
+}
+
+.ios-glass-button:active {
+  transform: translateY(0px) scale(0.96);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 4px 16px 0 rgba(0, 0, 0, 0.40),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.20);
+}
+
+.ios-glass-button-active {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--mood-primary, #00B4D8);
+  border-top-color: rgba(255, 255, 255, 0.60);
+  box-shadow: 
+    0 10px 30px -4px var(--mood-glow, rgba(0, 180, 216, 0.40)),
+    0 2px 8px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.45);
+  color: #FFFFFF;
+}
+
 .glass-light-modal {
   background: rgba(20, 27, 45, 0.94);
   backdrop-filter: blur(36px) saturate(190%);

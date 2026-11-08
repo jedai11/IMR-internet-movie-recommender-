@@ -50,10 +50,10 @@ export const EmotionPresets: React.FC<Props> = ({ currentCoordinates, onSelectPr
             <button
               key={t.themeId}
               onClick={() => onSelectPreset({ valence: t.defaultValence, arousal: t.defaultArousal })}
-              className={`p-3.5 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between group ${
+              className={`p-3.5 rounded-2xl text-left transition-all cursor-pointer flex flex-col justify-between group ${
                 isSelected
-                  ? 'glass-light-pill-active border-cyan-400 shadow-lg ring-2 ring-cyan-500/30 text-[#F8FAFC] -translate-y-1'
-                  : 'glass-light-card text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D]'
+                  ? 'ios-glass-button-active shadow-lg ring-2 ring-white/40 text-[#F8FAFC] -translate-y-1'
+                  : 'ios-glass-button text-[#CBD5E1] hover:text-[#F8FAFC]'
               }`}
             >
               <div>

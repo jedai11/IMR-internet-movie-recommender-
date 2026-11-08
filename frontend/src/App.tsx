@@ -127,6 +127,17 @@ const POPULAR_MOVIES_MAP: Record<string, { title: string; genres: string[] }> = 
   'kantara': { title: 'Kantara', genres: ['Action', 'Drama', 'Thriller'] }
 };
 
+const COMMON_MOODS = [
+  { id: 'calm', label: 'Calm & Peaceful', emoji: '🍃', valence: 0.82, arousal: -0.45, query: 'Calm and peaceful, looking for serene relaxation and comfort' },
+  { id: 'happy', label: 'Happy & Upbeat', emoji: '☀️', valence: 0.85, arousal: 0.65, query: 'Happy and energetic with upbeat optimism and comedy' },
+  { id: 'intense', label: 'Intense Thriller', emoji: '🔥', valence: -0.65, arousal: 0.88, query: 'Intense high-stakes psychological thriller with gripping suspense' },
+  { id: 'romantic', label: 'Romantic Love', emoji: '💜', valence: 0.85, arousal: 0.35, query: 'Romantic mood with tender love story and emotional intimacy' },
+  { id: 'sad', label: 'Sad & Melancholic', emoji: '🌧️', valence: -0.70, arousal: -0.40, query: 'Sad and melancholic, looking for deep nostalgic reflection' },
+  { id: 'focus', label: 'Focus & Grounded', emoji: '🌲', valence: 0.40, arousal: -0.20, query: 'Focus and concentration, balanced and thought-provoking cinema' },
+  { id: 'adrenaline', label: 'Action & Adrenaline', emoji: '⚡', valence: 0.75, arousal: 0.95, query: 'Excitement and adrenaline with pulse-pounding action' },
+  { id: 'night', label: 'Night Thriller', emoji: '🌙', valence: 0.10, arousal: 0.70, query: 'Night thriller with some kind of love' }
+];
+
 const SUGGESTIONS = [
   "Night thriller with some kind of love",
   "Calm & peaceful evening, looking for soothing comfort like Drive My Car or Departures",
@@ -688,25 +699,41 @@ export function App() {
             )}
           </div>
 
-          {/* Inspirational Prompt Chips (Quick suggestions) */}
+          {/* Clickable Common Mood Buttons (iPhone / iOS Glass Morphism Style) */}
           {recommendations.length === 0 && !loading && (
-            <div className="space-y-2 pt-2">
-              <span className="text-xs font-semibold text-[#CBD5E1]">
-                Or click to explore common moods:
-              </span>
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                {SUGGESTIONS.map((s, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setFreeText(s);
-                      handleDiscover(s);
-                    }}
-                    className="glass-light-pill text-xs text-[#CBD5E1] hover:text-[#F8FAFC] px-3.5 py-1.5 rounded-full text-left truncate max-w-md cursor-pointer border-[#29344D]"
-                  >
-                    ✨ {s}
-                  </button>
-                ))}
+            <div className="space-y-3 pt-3">
+              <div className="flex items-center justify-center gap-2">
+                <span className="h-px w-8 bg-gradient-to-r from-transparent to-white/20" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#CBD5E1]/80">
+                  Click to Explore Common Moods
+                </span>
+                <span className="h-px w-8 bg-gradient-to-l from-transparent to-white/20" />
+              </div>
+
+              {/* iPhone Frosted Glass Morphism Pills Grid */}
+              <div className="flex flex-wrap items-center justify-center gap-2.5 max-w-2xl mx-auto">
+                {COMMON_MOODS.map((m) => {
+                  const isActive =
+                    Math.abs(pickerCoords.valence - m.valence) < 0.25 &&
+                    Math.abs(pickerCoords.arousal - m.arousal) < 0.25;
+
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => {
+                        setPickerCoords({ valence: m.valence, arousal: m.arousal });
+                        setFreeText(m.query);
+                        handleDiscover(m.query);
+                      }}
+                      className={`ios-glass-button px-4 py-2.5 rounded-2xl text-xs font-extrabold flex items-center gap-2 cursor-pointer shadow-lg transition-all ${
+                        isActive ? 'ios-glass-button-active ring-2 ring-white/40' : ''
+                      }`}
+                    >
+                      <span className="text-base drop-shadow-sm">{m.emoji}</span>
+                      <span className="tracking-tight">{m.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
