@@ -3,6 +3,8 @@ import json
 import logging
 import subprocess
 import urllib.parse
+import time
+import threading
 from typing import Optional, Dict, Any, List
 import httpx
 from app.core.config import settings
@@ -22,6 +24,7 @@ class TMDBService:
         self.base_url = "https://api.themoviedb.org/3"
         self.image_base = settings.TMDB_IMAGE_BASE_URL.rstrip("/")
         self._memory_cache: Dict[str, Any] = {}
+        self.http_call_logs: List[Dict[str, Any]] = []
 
     def _execute_api_request(self, endpoint: str, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
@@ -37,31 +40,81 @@ class TMDBService:
             "Accept": "application/json"
         }
 
+        call_start = time.perf_counter()
+        call_timestamp = time.time()
+        thread_id = threading.get_ident()
+        status_code = None
+        was_retried = False
+        retry_method = None
+        result = None
+
         # 1. Attempt with HTTPX
         try:
             with httpx.Client(timeout=8.0, headers=headers, follow_redirects=True) as client:
                 r = client.get(url, params=req_params)
+                status_code = r.status_code
                 if r.status_code == 200:
-                    return r.json()
+                    result = r.json()
         except Exception as e:
             logger.debug(f"HTTPX request failed ({e}), attempting curl fallback for {url}")
 
         # 2. Resilient fallback to curl.exe
-        try:
-            query_str = urllib.parse.urlencode(req_params)
-            full_url = f"{url}?{query_str}"
-            res = subprocess.run(
-                ["curl.exe", "-sSL", "--max-time", "8", full_url],
-                capture_output=True,
-                text=True,
-                encoding="utf-8"
-            )
-            if res.returncode == 0 and res.stdout.strip():
-                return json.loads(res.stdout)
-        except Exception as e:
-            logger.error(f"Curl fallback failed for {url}: {e}")
+        if result is None:
+            was_retried = True
+            retry_method = "curl.exe"
+            try:
+                query_str = urllib.parse.urlencode(req_params)
+                full_url = f"{url}?{query_str}"
+                res = subprocess.run(
+                    ["curl.exe", "-sSL", "--max-time", "8", "-w", "\n%{http_code}", full_url],
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8"
+                )
+                if res.returncode == 0 and res.stdout.strip():
+                    lines = res.stdout.strip().split("\n")
+                    if len(lines) >= 2:
+                        raw_body = "\n".join(lines[:-1])
+                        try:
+                            status_code = int(lines[-1].strip())
+                        except ValueError:
+                            pass
+                    else:
+                        raw_body = lines[0]
+                    result = json.loads(raw_body)
+                    if status_code is None:
+                        status_code = 200
+            except Exception as e:
+                logger.error(f"Curl fallback failed for {url}: {e}")
 
-        return None
+        duration_ms = (time.perf_counter() - call_start) * 1000
+
+        log_entry = {
+            "index": len(self.http_call_logs) + 1,
+            "thread_id": thread_id,
+            "timestamp": call_timestamp,
+            "endpoint": endpoint,
+            "params": {k: v for k, v in params.items() if k != "api_key"},
+            "duration_ms": round(duration_ms, 2),
+            "status_code": status_code,
+            "was_retried": was_retried,
+            "retry_method": retry_method,
+            "success": result is not None
+        }
+        self.http_call_logs.append(log_entry)
+
+        logger.info(
+            f"[TMDB HTTP #{log_entry['index']}] Endpoint: {endpoint} | "
+            f"Duration: {duration_ms:.2f}ms | Status: {status_code} | "
+            f"Retried: {was_retried} ({retry_method}) | Thread: {thread_id}"
+        )
+        print(
+            f"[TMDB HTTP #{log_entry['index']}] Endpoint: {endpoint} | "
+            f"Params: {log_entry['params']} | Duration: {duration_ms:.2f}ms | "
+            f"Status: {status_code} | Retried: {was_retried}"
+        )
+
+        return result
 
     def search_movie_or_tv(self, title: str, year: Optional[int] = None) -> Optional[Dict[str, Any]]:
         """
@@ -201,6 +254,28 @@ class TMDBService:
             logger.error(f"HTTPX download failed for {img_url}: {e}")
 
         return None
+
+    def get_cached_enrichment(self, title: str, year: Optional[int] = None) -> Optional[Dict[str, Any]]:
+        """
+        Instant in-memory lookup (0ms): returns enriched details if already cached.
+        """
+        cache_key = f"search_{title.lower()}_{year}"
+        match = self._memory_cache.get(cache_key)
+        if match and match.get("id"):
+            details_key = f"details_{match.get('media_type', 'movie')}_{match['id']}"
+            return self._memory_cache.get(details_key)
+        return None
+
+    def enrich_movies_background(self, items: List[tuple]) -> None:
+        """
+        Background worker to fetch and cache TMDB metadata asynchronously
+        without blocking the user's recommendation response.
+        """
+        for title, year in items:
+            try:
+                self.enrich_movie(title, year)
+            except Exception as e:
+                logger.debug(f"Background enrichment failed for '{title}': {e}")
 
     def enrich_movie(self, title: str, year: Optional[int] = None) -> Dict[str, Any]:
         """

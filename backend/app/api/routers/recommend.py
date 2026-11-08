@@ -1,8 +1,8 @@
 import time
 import json
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from app.db.session import get_db
 from app.db.models import MovieTitle, UserRating, EventLog
@@ -25,6 +25,7 @@ router = APIRouter(prefix="/recommend", tags=["recommend"])
 @router.post("", response_model=RecommendationResponse)
 def get_recommendations(
     request: RecommendationRequest,
+    background_tasks: BackgroundTasks = None,
     db: Session = Depends(get_db)
 ):
     """
@@ -105,6 +106,13 @@ def get_recommendations(
             matched_preferred_genre=detail.get("matched_preferred_genre")
         )
 
+        # Fast in-memory lookup or local DB fallback (0ms)
+        cached_meta = tmdb_service.get_cached_enrichment(movie.title, movie.release_year)
+        tmdb_rating = (cached_meta.get("vote_average") if cached_meta else None) or getattr(movie, "popularity_score", None)
+        vote_count = cached_meta.get("vote_count") if cached_meta else None
+        backdrop_url = cached_meta.get("backdrop_url") if cached_meta else None
+        trailer_url = cached_meta.get("trailer_url") if cached_meta else None
+
         rec = MovieRecommendation(
             title_id=movie.id,
             title=movie.title,
@@ -116,10 +124,10 @@ def get_recommendations(
             synopsis=movie.synopsis,
             streaming_platforms=platforms,
             score=score,
-            tmdb_rating=tmdb_service.enrich_movie(movie.title, movie.release_year).get("vote_average"),
-            vote_count=tmdb_service.enrich_movie(movie.title, movie.release_year).get("vote_count"),
-            backdrop_url=tmdb_service.enrich_movie(movie.title, movie.release_year).get("backdrop_url"),
-            trailer_url=tmdb_service.enrich_movie(movie.title, movie.release_year).get("trailer_url"),
+            tmdb_rating=tmdb_rating,
+            vote_count=vote_count,
+            backdrop_url=backdrop_url,
+            trailer_url=trailer_url,
             mood_compatibility=MoodCompatibility(
                 title_valence=detail["title_valence"],
                 title_arousal=detail["title_arousal"],
@@ -144,6 +152,15 @@ def get_recommendations(
             session_id=request.session_id,
             db=db
         )
+
+    # Queue background enrichment for any uncached titles (does not block client response)
+    uncached_titles = [
+        (m.title, m.release_year)
+        for m, _, _ in top_matches
+        if not tmdb_service.get_cached_enrichment(m.title, m.release_year)
+    ]
+    if uncached_titles and background_tasks is not None:
+        background_tasks.add_task(tmdb_service.enrich_movies_background, uncached_titles)
 
     latency_ms = int((time.time() - start_time) * 1000)
 
