@@ -481,19 +481,19 @@ export function App() {
       </div>
 
       {/* Main Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-12 space-y-12 relative z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-28 sm:pt-36 lg:pt-40 pb-16 space-y-14 relative z-10">
         
         {/* ========================================================================= */}
         {/* CENTER HERO SEARCH CAPSULE (Glass-Light Morphism)                        */}
         {/* ========================================================================= */}
-        <section className="max-w-3xl mx-auto space-y-6 text-center">
+        <section className="max-w-3xl mx-auto space-y-8 text-center mt-2 sm:mt-4">
           
-          {/* Hero Headlines */}
-          <div className="space-y-2">
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#F8FAFC] drop-shadow-md">
+          {/* Hero Headlines & Information */}
+          <div className="space-y-3">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#F8FAFC] drop-shadow-md">
               Discover Cinema Grounded in Your Mood
             </h1>
-            <p className="text-sm text-[#CBD5E1] max-w-xl mx-auto leading-relaxed font-medium">
+            <p className="text-sm sm:text-base text-[#CBD5E1] max-w-xl mx-auto leading-relaxed font-medium">
               Express your feelings, mention movies or dramas you love, or fine-tune your affective coordinates on Russell's Circumplex.
             </p>
           </div>
