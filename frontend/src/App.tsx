@@ -492,7 +492,7 @@ export function App() {
         {/* ========================================================================= */}
         {/* CENTER HERO SEARCH CAPSULE (Glass-Light Morphism)                        */}
         {/* ========================================================================= */}
-        <section className="max-w-2xl mx-auto space-y-8 text-center mt-2 sm:mt-4">
+        <section className="max-w-3xl mx-auto space-y-8 text-center mt-2 sm:mt-4">
           
           {/* Hero Headlines & Information */}
           <div className="space-y-3">
@@ -505,15 +505,15 @@ export function App() {
           </div>
 
           {/* Central Glassmorphic Search Bar Capsule */}
-          <div className="glass-light-panel rounded-3xl p-5 sm:p-6 space-y-4 text-left transition-all relative">
+          <div className="glass-light-panel rounded-3xl px-5 py-3.5 sm:px-6 sm:py-4 space-y-3 text-left transition-all relative">
             
             {/* Input Row */}
-            <div className="relative flex items-start gap-3">
-              <div className="mt-2.5 text-indigo-400 shrink-0">
+            <div className="relative flex items-center gap-3">
+              <div className="text-indigo-400 shrink-0">
                 <Search className="w-5 h-5 text-indigo-400" />
               </div>
 
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 space-y-1.5">
                 <textarea
                   value={freeText}
                   onChange={(e) => handleTextChange(e.target.value)}
@@ -523,18 +523,18 @@ export function App() {
                       handleDiscover();
                     }
                   }}
-                  placeholder="How are you feeling? e.g. Loved Parasite and Train to Busan, feeling exhausted after work, recommend an exciting thriller or K-drama..."
-                  rows={2}
-                  className="w-full bg-transparent text-[#F8FAFC] placeholder:text-slate-400 text-sm sm:text-base font-medium focus:outline-none resize-none leading-relaxed"
+                  placeholder="Describe your mood, vibes, or favorite movies (e.g. night thriller with love, Annabelle)..."
+                  rows={1}
+                  className="w-full bg-transparent text-[#F8FAFC] placeholder:text-slate-400 text-sm sm:text-base font-medium focus:outline-none resize-none leading-normal py-1"
                 />
 
                 {/* Real-time Analyzed Badges */}
                 {(referencedMovies.length > 0 || detectedGenres.length > 0) && (
-                  <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-[#29344D]">
+                  <div className="flex items-center gap-2 flex-wrap pt-1.5 border-t border-[#29344D]">
                     {referencedMovies.map((ref) => (
                       <span
                         key={ref.title}
-                        className="glass-light-pill px-3 py-1 rounded-full text-xs font-bold text-amber-300 flex items-center gap-1 border-amber-500/40 bg-amber-950/40"
+                        className="glass-light-pill px-2.5 py-0.5 rounded-full text-[11px] font-bold text-amber-300 flex items-center gap-1 border-amber-500/40 bg-amber-950/40"
                       >
                         🎬 {ref.title}
                         <span className="opacity-70 font-normal text-[10px]">({ref.genres.join(', ')})</span>
@@ -543,7 +543,7 @@ export function App() {
                     {detectedGenres.map((g) => (
                       <span
                         key={g}
-                        className="glass-light-pill px-3 py-1 rounded-full text-xs font-bold text-cyan-300 border-cyan-500/40 bg-cyan-950/40"
+                        className="glass-light-pill px-2.5 py-0.5 rounded-full text-[11px] font-bold text-cyan-300 border-cyan-500/40 bg-cyan-950/40"
                       >
                         🎯 {g}
                       </span>
@@ -555,7 +555,7 @@ export function App() {
               {freeText.trim() && (
                 <button
                   onClick={() => handleTextChange('')}
-                  className="glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] p-1.5 rounded-full transition mt-1"
+                  className="glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] p-1.5 rounded-full transition"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -563,7 +563,7 @@ export function App() {
             </div>
 
             {/* Tool Toggles Ribbon */}
-            <div className="flex items-center justify-between flex-wrap gap-2.5 pt-3.5 border-t border-[#29344D]">
+            <div className="flex items-center justify-between flex-wrap gap-2 pt-2.5 border-t border-[#29344D]">
               <div className="flex items-center gap-2 flex-wrap">
                 {/* 2D Mood Canvas Toggle */}
                 <button
