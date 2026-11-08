@@ -68,6 +68,17 @@ GENRE_LEXICON = {
     "suspense": "Thriller",
     "thrilling": "Thriller",
     "psychological thriller": "Thriller",
+    "night thriller": ["Thriller", "Night-Movie"],
+    "night-thriller": ["Thriller", "Night-Movie"],
+    "night movie": "Night-Movie",
+    "night-movie": "Night-Movie",
+    "night cinema": "Night-Movie",
+    "late night": "Night-Movie",
+    "midnight": "Night-Movie",
+    "nocturnal": "Night-Movie",
+    "noir": "Night-Movie",
+    "neo-noir": "Night-Movie",
+    "night": "Night-Movie",
     "comedy": "Comedy",
     "comedies": "Comedy",
     "funny": "Comedy",
@@ -78,10 +89,24 @@ GENRE_LEXICON = {
     "romance": "Romance",
     "romantic": "Romance",
     "love story": "Romance",
+    "some kind of love": "Romance",
+    "kind of love": "Romance",
+    "with love": "Romance",
+    "love": "Romance",
     "horror": "Horror",
     "scary": "Horror",
     "spooky": "Horror",
     "frightening": "Horror",
+    "terrifying": "Horror",
+    "supernatural": "Horror",
+    "slasher": "Horror",
+    "haunted": "Horror",
+    "creepy": "Horror",
+    "ghost": "Horror",
+    "demon": "Horror",
+    "doll": "Horror",
+    "possession": "Horror",
+    "jump scare": "Horror",
     "drama": "Drama",
     "dramatic": "Drama",
     "action": "Action",
@@ -151,7 +176,40 @@ POPULAR_TITLES_LEXICON = {
     "avatar": {"title": "Avatar", "genres": ["Action", "Adventure", "Sci-Fi", "Fantasy"]},
     "oppenheimer": {"title": "Oppenheimer", "genres": ["Drama", "Thriller"]},
     "stranger things": {"title": "Stranger Things", "genres": ["Drama", "Fantasy", "Horror", "Sci-Fi"]},
-    "breaking bad": {"title": "Breaking Bad", "genres": ["Crime", "Drama", "Thriller"]}
+    "breaking bad": {"title": "Breaking Bad", "genres": ["Crime", "Drama", "Thriller"]},
+    # Horror masterpieces
+    "annabelle": {"title": "Annabelle", "genres": ["Horror", "Mystery", "Thriller"], "origin": "Hollywood"},
+    "the conjuring": {"title": "The Conjuring", "genres": ["Horror", "Mystery", "Thriller"], "origin": "Hollywood"},
+    "conjuring": {"title": "The Conjuring", "genres": ["Horror", "Mystery", "Thriller"], "origin": "Hollywood"},
+    "hereditary": {"title": "Hereditary", "genres": ["Horror", "Drama", "Mystery"], "origin": "Hollywood"},
+    "a quiet place": {"title": "A Quiet Place", "genres": ["Horror", "Sci-Fi", "Thriller"], "origin": "Hollywood"},
+    "quiet place": {"title": "A Quiet Place", "genres": ["Horror", "Sci-Fi", "Thriller"], "origin": "Hollywood"},
+    "insidious": {"title": "Insidious", "genres": ["Horror", "Mystery", "Thriller"], "origin": "Hollywood"},
+    "get out": {"title": "Get Out", "genres": ["Horror", "Mystery", "Thriller"], "origin": "Hollywood"},
+    "tumbbad": {"title": "Tumbbad", "genres": ["Horror", "Fantasy", "Drama"], "origin": "Bollywood"},
+    "stree": {"title": "Stree", "genres": ["Comedy", "Horror"], "origin": "Bollywood"},
+    "sinister": {"title": "Sinister", "genres": ["Horror", "Mystery", "Thriller"], "origin": "Hollywood"},
+    "the nun": {"title": "The Nun", "genres": ["Horror", "Mystery", "Thriller"], "origin": "Hollywood"},
+    # Bollywood classics & blockbusters
+    "3 idiots": {"title": "3 Idiots", "genres": ["Comedy", "Drama"], "origin": "Bollywood"},
+    "three idiots": {"title": "3 Idiots", "genres": ["Comedy", "Drama"], "origin": "Bollywood"},
+    "andhadhun": {"title": "Andhadhun", "genres": ["Crime", "Thriller", "Comedy"], "origin": "Bollywood"},
+    "dangal": {"title": "Dangal", "genres": ["Action", "Drama"], "origin": "Bollywood"},
+    "znmd": {"title": "Zindagi Na Milegi Dobara", "genres": ["Comedy", "Drama", "Romance"], "origin": "Bollywood"},
+    "zindagi na milegi dobara": {"title": "Zindagi Na Milegi Dobara", "genres": ["Comedy", "Drama", "Romance"], "origin": "Bollywood"},
+    "ddlj": {"title": "Dilwale Dulhania Le Jayenge", "genres": ["Drama", "Romance"], "origin": "Bollywood"},
+    "dilwale dulhania le jayenge": {"title": "Dilwale Dulhania Le Jayenge", "genres": ["Drama", "Romance"], "origin": "Bollywood"},
+    "gangs of wasseypur": {"title": "Gangs of Wasseypur", "genres": ["Action", "Crime", "Drama"], "origin": "Bollywood"},
+    "sholay": {"title": "Sholay", "genres": ["Action", "Adventure", "Drama"], "origin": "Bollywood"},
+    # Tollywood / South Indian epics
+    "rrr": {"title": "RRR", "genres": ["Action", "Drama"], "origin": "Tollywood"},
+    "baahubali": {"title": "Baahubali: The Beginning", "genres": ["Action", "Drama", "Fantasy"], "origin": "Tollywood"},
+    "bahubali": {"title": "Baahubali: The Beginning", "genres": ["Action", "Drama", "Fantasy"], "origin": "Tollywood"},
+    "baahubali 2": {"title": "Baahubali 2: The Conclusion", "genres": ["Action", "Drama", "Fantasy"], "origin": "Tollywood"},
+    "pushpa": {"title": "Pushpa: The Rise", "genres": ["Action", "Crime", "Drama"], "origin": "Tollywood"},
+    "eega": {"title": "Eega", "genres": ["Action", "Comedy", "Fantasy", "Romance"], "origin": "Tollywood"},
+    "kantara": {"title": "Kantara", "genres": ["Action", "Drama", "Thriller"], "origin": "Tollywood"},
+    "kgf": {"title": "K.G.F: Chapter 1", "genres": ["Action", "Crime", "Drama"], "origin": "Tollywood"}
 }
 
 class LLMService:
@@ -165,10 +223,14 @@ class LLMService:
         lower_text = text.lower()
         found_genres = set()
         
-        for phrase, canonical_genre in GENRE_LEXICON.items():
+        for phrase in sorted(GENRE_LEXICON.keys(), key=lambda k: len(k), reverse=True):
             pattern = r"\b" + re.escape(phrase) + r"\b"
             if re.search(pattern, lower_text):
-                found_genres.add(canonical_genre)
+                canonical = GENRE_LEXICON[phrase]
+                if isinstance(canonical, list):
+                    found_genres.update(canonical)
+                else:
+                    found_genres.add(canonical)
                 
         return sorted(list(found_genres))
 
@@ -261,15 +323,21 @@ class LLMService:
                 models_to_try.append("gemini-3.5-flash")
 
             prompt = (
-                "You are an expert filmologist and affective psychology assistant. "
-                "The user may express their current emotional state, desired movie genres, "
-                "AND/OR mention specific movie or drama titles they like or want recommendations similar to "
-                "(e.g., 'Parasite', 'Crash Landing on You', 'Inception', 'Goblin', 'Train to Busan', 'Squid Game', 'Drive My Car', 'Better Days', 'Interstellar', etc.).\n\n"
-                "Perform these tasks:\n"
-                "1. Detect any referenced movie, drama, or show titles. For each title, analyze and list its primary cinematic genres.\n"
-                "2. Collect all desired genres: combining both explicitly requested genres (e.g. 'thriller') and the analyzed genres of the referenced titles.\n"
-                "3. Determine emotional valence (-1.0 to +1.0) and arousal (-1.0 to +1.0).\n"
-                "4. Provide 2-4 emotional tags describing the state.\n\n"
+                "You are an expert filmologist, affective psychologist, and semantic movie discovery assistant with universal knowledge of cinema across all global origins (Hollywood, Bollywood, Tollywood, Asian, European, etc.).\n"
+                "The user provides free-text stating their mood, vibes, cinematic tastes, and/or desired movies/dramas.\n\n"
+                "Perform these tasks with deep semantic accuracy:\n"
+                "1. World Movie & Title Decoding:\n"
+                "   - Detect if the user mentions ANY movie, drama, or franchise from ANY origin in the world (e.g. 'Annabelle', 'The Conjuring', 'Hereditary', 'Tumbbad', 'RRR', '3 Idiots', 'Inception', 'Parasite', 'Crash Landing on You').\n"
+                "   - Accurately identify its canonical genres (e.g. 'Annabelle' is strictly Horror, Mystery, Thriller. NEVER classify horror movies as Romance or Comedy!).\n"
+                "   - Add the detected movie to 'referenced_movies' and include its canonical genres in 'desired_genres'.\n"
+                "2. Atmospheric & Genre Extraction:\n"
+                "   - Extract all desired cinematic genres (e.g. 'Horror', 'Thriller', 'Romance', 'Night-Movie', 'Mystery', 'Crime', 'Comedy', 'Drama', 'Action', 'Sci-Fi', 'Animation', 'Fantasy').\n"
+                "   - If user asks for 'night thriller', understand they want BOTH 'Thriller' and 'Night-Movie'.\n"
+                "   - If user mentions 'some kind of love', 'with love', or 'love', understand they want 'Romance'.\n"
+                "3. Circumplex Affect Vector:\n"
+                "   - Compute emotional valence (-1.0 to +1.0) and arousal (-1.0 to +1.0) matching the user's emotional state or the tone of the movie mentioned (e.g. Annabelle/Horror is negative valence -0.7 to -0.9, high arousal +0.8 to +0.95).\n"
+                "4. Emotional Tags:\n"
+                "   - Provide 2-4 descriptive emotional affect tags.\n\n"
                 "Return ONLY valid JSON matching this exact structure:\n"
                 "{\n"
                 '  "valence": float,\n'
@@ -285,12 +353,15 @@ class LLMService:
             )
 
             headers = {"Content-Type": "application/json"}
-            data = {"contents": [{"parts": [{"text": prompt}]}]}
+            data = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"temperature": 0.2}
+            }
 
             for m in models_to_try:
                 try:
                     url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={gemini_key}"
-                    with httpx.Client(timeout=5.0) as client:
+                    with httpx.Client(timeout=12.0) as client:
                         resp = client.post(url, headers=headers, json=data)
                         if resp.status_code == 200:
                             content = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
@@ -317,13 +388,18 @@ class LLMService:
                                     if isinstance(r, dict):
                                         all_genres.update(r.get("genres", []))
 
+                                # Merge emotional tags from affective lexicon
+                                heur_tokens = re.findall(r"\b[a-zA-Z]{3,}\b", text.lower())
+                                heur_tags = [t for t in heur_tokens if t in AFFECTIVE_LEXICON]
+                                all_tags = list(dict.fromkeys(list(parsed.get("tags", [])) + heur_tags))
+
                                 return (
                                     MoodVector(
                                         valence=float(parsed["valence"]),
                                         arousal=float(parsed["arousal"]),
                                         confidence=float(parsed.get("confidence", 0.90))
                                     ),
-                                    list(parsed.get("tags", [])),
+                                    all_tags,
                                     sorted(list(all_genres)),
                                     raw_refs
                                 )

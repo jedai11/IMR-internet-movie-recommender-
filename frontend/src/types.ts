@@ -48,6 +48,7 @@ export interface FilterCriteria {
   min_runtime?: number;
   excluded_genres: string[];
   preferred_genres?: string[];
+  origins?: string[];
   excluded_warnings: string[];
   streaming_providers: string[];
   exclude_seen: boolean;
@@ -72,6 +73,7 @@ export interface MovieRecommendation {
   release_year: number;
   runtime_minutes: number;
   genres: string[];
+  origin?: string;
   poster_url?: string;
   synopsis?: string;
   streaming_platforms: string[];

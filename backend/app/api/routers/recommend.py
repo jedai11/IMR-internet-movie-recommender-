@@ -101,6 +101,7 @@ def get_recommendations(
             release_year=movie.release_year,
             runtime_minutes=movie.runtime_minutes,
             genres=genre_names,
+            origin=getattr(movie, "origin", "Hollywood") or "Hollywood",
             poster_url=f"/api/catalog/poster/{movie.id}",
             synopsis=movie.synopsis,
             streaming_platforms=platforms,

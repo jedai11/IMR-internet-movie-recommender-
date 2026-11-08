@@ -17,43 +17,61 @@ export const MovieCard: React.FC<Props> = ({ movie, onOpenWhyThis, onFeedback })
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-3xl overflow-hidden hover:border-indigo-400/60 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(31,38,135,0.08)] hover:-translate-y-1 flex flex-col justify-between group">
+    <div className="glass-light-card rounded-3xl overflow-hidden flex flex-col justify-between group relative border-[#29344D]">
       <div>
         {/* Real Front Page / Theatrical Poster */}
-        <div className="relative aspect-[2/3] w-full overflow-hidden bg-slate-100 flex items-center justify-center">
+        <div className="relative aspect-[2/3] w-full overflow-hidden bg-slate-900 flex items-center justify-center">
           <img
             src={movie.poster_url || `/api/catalog/poster/${movie.title_id}`}
             alt={`${movie.title} official poster`}
             loading="lazy"
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
+          {/* Ambient Frosted Sheen */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#080B16] via-transparent to-white/5 pointer-events-none" />
 
-          {/* Match Score Badge */}
-          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md text-slate-800 px-3 py-1 rounded-full text-xs font-extrabold shadow-md border border-white/60 flex items-center gap-1 font-mono">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          {/* Origin Badge */}
+          {movie.origin && (
+            <div className="absolute top-3 left-3 text-[11px] font-bold text-cyan-200 bg-[#080B16]/85 backdrop-blur-md px-2.5 py-1 rounded-full border border-[#29344D] shadow-md flex items-center gap-1">
+              <span>
+                {movie.origin === 'Bollywood'
+                  ? '🇮🇳 Bollywood'
+                  : movie.origin === 'Tollywood'
+                  ? '⚡ Tollywood'
+                  : movie.origin === 'Korean'
+                  ? '🇰🇷 Korean'
+                  : movie.origin === 'Japanese'
+                  ? '🇯🇵 Japanese'
+                  : '🎬 ' + movie.origin}
+              </span>
+            </div>
+          )}
+
+          {/* Match Score Badge (Glass Pill) */}
+          <div className="absolute top-3 right-3 glass-light-pill text-[#F8FAFC] px-3 py-1 rounded-full text-xs font-black flex items-center gap-1.5 font-mono shadow-md border-[#29344D]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             {movie.mood_compatibility.fit_percentage}% Match
           </div>
 
           {/* Runtime */}
-          <div className="absolute bottom-3 left-3 text-[11px] font-semibold text-white bg-slate-900/75 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm">
-            <Clock className="w-3 h-3 text-indigo-300" />
+          <div className="absolute bottom-3 left-3 text-[11px] font-semibold text-[#F8FAFC] bg-[#080B16]/80 backdrop-blur-md px-3 py-1 rounded-xl flex items-center gap-1.5 border border-[#29344D] shadow-md">
+            <Clock className="w-3.5 h-3.5 text-cyan-300" />
             {movie.runtime_minutes}m • {movie.release_year}
           </div>
         </div>
 
         {/* Details */}
-        <div className="p-5 space-y-3.5">
+        <div className="p-5 sm:p-6 space-y-4">
           <div>
-            <h4 className="text-base font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors">
+            <h4 className="text-lg font-black text-[#F8FAFC] group-hover:text-cyan-300 transition-colors tracking-tight">
               {movie.title}
             </h4>
-            <div className="flex flex-wrap gap-1.5 mt-2">
+            <div className="flex flex-wrap gap-1.5 mt-2.5">
               {movie.genres.map((g) => (
                 <span
                   key={g}
-                  className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/70"
+                  className="glass-light-pill px-2.5 py-0.5 rounded-full text-[10px] font-bold text-[#CBD5E1] border-[#29344D]"
                 >
                   {g}
                 </span>
@@ -62,22 +80,24 @@ export const MovieCard: React.FC<Props> = ({ movie, onOpenWhyThis, onFeedback })
           </div>
 
           {/* Rationale Quote */}
-          <p className="text-xs text-slate-700 leading-relaxed italic bg-indigo-50/70 border-l-2 border-indigo-500 rounded-r-lg pl-3 pr-2 py-1.5">
-            "{movie.match_rationale}"
-          </p>
+          <div className="glass-light-inner rounded-2xl p-3 border-l-4 border-cyan-400 shadow-sm">
+            <p className="text-xs text-[#CBD5E1] leading-relaxed italic">
+              "{movie.match_rationale}"
+            </p>
+          </div>
 
           {/* Synopsis */}
           {movie.synopsis && (
-            <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-[#CBD5E1]/90 line-clamp-2 leading-relaxed font-normal">
               {movie.synopsis}
             </p>
           )}
 
           {/* Platforms */}
           {movie.streaming_platforms.length > 0 && (
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-500 pt-0.5">
-              <Tv className="w-3 h-3 text-indigo-500" />
-              <span className="capitalize font-medium">
+            <div className="flex items-center gap-2 text-xs text-[#CBD5E1] pt-1 font-medium">
+              <Tv className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="capitalize font-semibold">
                 {movie.streaming_platforms.join(', ')}
               </span>
             </div>
@@ -86,42 +106,42 @@ export const MovieCard: React.FC<Props> = ({ movie, onOpenWhyThis, onFeedback })
       </div>
 
       {/* Footer Actions */}
-      <div className="p-5 pt-0 space-y-3">
+      <div className="p-5 sm:p-6 pt-0 space-y-3.5">
         <button
           onClick={onOpenWhyThis}
-          className="w-full py-2 px-3 rounded-xl text-xs font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50/80 hover:bg-indigo-100/90 border border-indigo-200/60 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+          className="glass-light-pill w-full py-2.5 px-4 rounded-2xl text-xs font-black text-cyan-300 hover:text-[#F8FAFC] transition flex items-center justify-center gap-2 cursor-pointer hover:border-cyan-400/50 shadow-sm border-[#29344D]"
         >
-          <Info className="w-3.5 h-3.5" />
+          <Info className="w-4 h-4 text-cyan-400" />
           Why this recommendation?
         </button>
 
         {/* 1-Tap Feedback Buttons */}
-        <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
-          <span className="text-[11px] font-medium text-slate-400">Rate fit:</span>
+        <div className="pt-3 border-t border-[#29344D] flex items-center justify-between text-xs">
+          <span className="text-[11px] font-semibold text-[#CBD5E1]/70">Rate fit:</span>
           {feedbackGiven ? (
-            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+            <span className="glass-light-pill text-[11px] font-bold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded-lg border-emerald-500/40">
               Feedback saved ✓
             </span>
           ) : (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={() => handleFeedbackClick('helped')}
                 title="Helped my mood"
-                className="p-1.5 rounded-lg hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 transition cursor-pointer"
+                className="glass-light-pill p-2 rounded-xl hover:text-emerald-400 text-[#CBD5E1] transition cursor-pointer border-[#29344D]"
               >
                 <Heart className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleFeedbackClick('watched')}
                 title="I'll watch this"
-                className="p-1.5 rounded-lg hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 transition cursor-pointer"
+                className="glass-light-pill p-2 rounded-xl hover:text-cyan-400 text-[#CBD5E1] transition cursor-pointer border-[#29344D]"
               >
                 <Eye className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleFeedbackClick('skipped')}
                 title="Not what I need"
-                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                className="glass-light-pill p-2 rounded-xl hover:text-rose-400 text-[#CBD5E1] transition cursor-pointer border-[#29344D]"
               >
                 <FastForward className="w-4 h-4" />
               </button>

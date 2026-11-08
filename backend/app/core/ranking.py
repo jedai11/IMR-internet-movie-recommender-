@@ -55,8 +55,9 @@ def rank_candidates(
             overlap = movie_genre_names.intersection(preferred_lower)
             if overlap:
                 matched_preferred = [g.name for g in movie.genres if g.name.lower() in overlap]
-                # High priority boost (+2.0) ensures requested genre candidates rank above non-matching genres
-                genre_match_boost = 2.0
+                # High priority boost ensures requested genre candidates rank above non-matching genres,
+                # with compounding weight when matching multiple requested semantic dimensions (e.g., Night-Movie + Romance + Thriller)
+                genre_match_boost = 2.0 * len(overlap)
 
         # Composite score
         total_score = (w_mood * mood_fit) + (w_taste * taste_fit) + genre_match_boost

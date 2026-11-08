@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     
     # LLM API configuration (optional)
     GEMINI_API_KEY: Optional[str] = None
-    GEMINI_MODEL: str = "gemini-2.5-flash"
+    GEMINI_MODEL: str = "gemini-3.5-flash"
     OPENAI_API_KEY: Optional[str] = None
     LLM_PROVIDER: str = "auto"  # 'gemini', 'openai', or 'heuristic'
     

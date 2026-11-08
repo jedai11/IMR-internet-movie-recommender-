@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, AlertTriangle, Clock, Film, Tv, ShieldAlert } from 'lucide-react';
+import { Filter, AlertTriangle, Clock, Film, Tv, ShieldAlert, Globe } from 'lucide-react';
 import { FilterCriteria } from '../../types';
 
 interface Props {
@@ -7,10 +7,20 @@ interface Props {
   onChange: (filters: FilterCriteria) => void;
 }
 
+const CINEMA_ORIGINS = [
+  { code: 'all', label: '🌐 All Origins' },
+  { code: 'hollywood', label: '🎬 Hollywood' },
+  { code: 'bollywood', label: '🇮🇳 Bollywood' },
+  { code: 'tollywood', label: '⚡ Tollywood (South)' },
+  { code: 'korean', label: '🇰🇷 Korean' },
+  { code: 'japanese', label: '🇯🇵 Japanese & Anime' },
+  { code: 'asian', label: '🌏 Asian / Intl' }
+];
+
 const AVAILABLE_GENRES = [
   'Action', 'Adventure', 'Animation', 'Comedy', 'Crime',
   'Drama', 'Family', 'Fantasy', 'Horror', 'Music', 'Mystery',
-  'Romance', 'Sci-Fi', 'Thriller'
+  'Night-Movie', 'Romance', 'Sci-Fi', 'Thriller'
 ];
 
 const AVAILABLE_WARNINGS = [
@@ -56,28 +66,40 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
     onChange({ ...filters, streaming_providers: next });
   };
 
+  const toggleOrigin = (originCode: string) => {
+    if (originCode === 'all') {
+      onChange({ ...filters, origins: [] });
+      return;
+    }
+    const current = (filters.origins || []).filter((o) => o !== 'all');
+    const next = current.includes(originCode)
+      ? current.filter((o) => o !== originCode)
+      : [...current, originCode];
+    onChange({ ...filters, origins: next });
+  };
+
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/90 rounded-3xl p-6 space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+    <div className="glass-light-panel rounded-3xl p-6 sm:p-7 space-y-6 border-[#29344D]">
+      <div className="flex items-center justify-between border-b border-[#29344D] pb-3.5">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-indigo-600" />
-          <h3 className="text-sm font-bold text-slate-800">
+          <Filter className="w-4 h-4 text-cyan-400" />
+          <h3 className="text-sm font-black text-[#F8FAFC] tracking-tight">
             Hard Exclusion & Preference Engine
           </h3>
         </div>
-        <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-2 py-0.5 rounded-full">
+        <span className="glass-light-pill text-[11px] font-bold text-cyan-300 px-3 py-1 rounded-full border-[#29344D]">
           Grounded Catalog
         </span>
       </div>
 
       {/* 1. Runtime Cap */}
-      <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+      <div className="space-y-2.5">
+        <label className="text-xs font-bold text-[#F8FAFC] flex items-center justify-between">
           <span className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-slate-500" />
+            <Clock className="w-3.5 h-3.5 text-[#CBD5E1]" />
             Maximum Runtime
           </span>
-          <span className="font-mono text-indigo-700 font-bold bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+          <span className="glass-light-pill font-mono text-cyan-300 font-bold px-2.5 py-0.5 rounded-lg border-[#29344D]">
             {filters.max_runtime ? `${filters.max_runtime} min` : 'Any Length'}
           </span>
         </label>
@@ -91,9 +113,9 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
             const val = Number(e.target.value);
             onChange({ ...filters, max_runtime: val >= 200 ? undefined : val });
           }}
-          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+          className="w-full h-2 bg-[#1C2540] rounded-lg appearance-none cursor-pointer accent-cyan-400"
         />
-        <div className="flex justify-between text-[10px] text-slate-400">
+        <div className="flex justify-between text-[10px] text-[#CBD5E1]/70 font-semibold">
           <span>60 min</span>
           <span>120 min</span>
           <span>No Cap</span>
@@ -101,26 +123,26 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
       </div>
 
       {/* 2. Content Warnings */}
-      <div className="space-y-2.5">
-        <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+      <div className="space-y-3">
+        <label className="text-xs font-bold text-[#F8FAFC] flex items-center gap-1.5">
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
           Exclude Trigger Warnings
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {AVAILABLE_WARNINGS.map((w) => {
             const isExcluded = filters.excluded_warnings.includes(w.code);
             return (
               <button
                 key={w.code}
                 onClick={() => toggleWarning(w.code)}
-                className={`p-2.5 rounded-xl text-xs text-left border transition cursor-pointer flex items-center justify-between ${
+                className={`p-3 rounded-2xl text-xs text-left border transition cursor-pointer flex items-center justify-between ${
                   isExcluded
-                    ? 'bg-rose-50 border-rose-300 text-rose-800 font-semibold'
-                    : 'bg-white/80 border-slate-200/80 text-slate-600 hover:border-slate-300'
+                    ? 'glass-light-pill border-rose-500/50 text-rose-300 font-bold bg-rose-950/40 shadow-sm'
+                    : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D]'
                 }`}
               >
                 <span>{w.label}</span>
-                {isExcluded && <span className="text-[10px] text-rose-600 font-bold">EXCLUDED</span>}
+                {isExcluded && <span className="text-[10px] text-rose-400 font-black">EXCLUDED</span>}
               </button>
             );
           })}
@@ -128,22 +150,22 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
       </div>
 
       {/* 3. Genre Exclusions */}
-      <div className="space-y-2.5">
-        <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-          <Film className="w-3.5 h-3.5 text-slate-500" />
+      <div className="space-y-3">
+        <label className="text-xs font-bold text-[#F8FAFC] flex items-center gap-1.5">
+          <Film className="w-3.5 h-3.5 text-[#CBD5E1]" />
           Exclude Specific Genres
         </label>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {AVAILABLE_GENRES.map((g) => {
             const isExcluded = filters.excluded_genres.includes(g);
             return (
               <button
                 key={g}
                 onClick={() => toggleGenre(g)}
-                className={`px-3 py-1 rounded-full text-xs transition cursor-pointer border ${
+                className={`px-3.5 py-1.5 rounded-full text-xs transition cursor-pointer ${
                   isExcluded
-                    ? 'bg-rose-50 text-rose-700 border-rose-300 font-semibold line-through'
-                    : 'bg-white/80 text-slate-700 border-slate-200 hover:border-slate-300'
+                    ? 'glass-light-pill bg-rose-950/40 text-rose-300 border-rose-500/50 font-bold line-through'
+                    : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] font-medium border-[#29344D]'
                 }`}
               >
                 {g}
@@ -153,23 +175,58 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
         </div>
       </div>
 
-      {/* 4. Streaming Availability */}
-      <div className="space-y-2.5">
-        <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-          <Tv className="w-3.5 h-3.5 text-slate-500" />
-          Filter by Streaming Platforms
+      {/* 4. Movie Origin / Cinema Industry */}
+      <div className="space-y-3">
+        <label className="text-xs font-bold text-[#F8FAFC] flex items-center justify-between">
+          <span className="flex items-center gap-1.5">
+            <Globe className="w-3.5 h-3.5 text-cyan-400" />
+            Origin & Cinema Industry
+          </span>
+          <span className="text-[10px] text-[#CBD5E1]/70 font-semibold">
+            {(!filters.origins || filters.origins.length === 0) ? 'All World Cinema' : `${filters.origins.length} Selected`}
+          </span>
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {CINEMA_ORIGINS.map((orig) => {
+            const isAll = orig.code === 'all';
+            const isSelected = isAll
+              ? !filters.origins || filters.origins.length === 0
+              : (filters.origins || []).includes(orig.code);
+
+            return (
+              <button
+                key={orig.code}
+                onClick={() => toggleOrigin(orig.code)}
+                className={`p-2.5 rounded-2xl text-xs transition cursor-pointer font-bold border flex items-center justify-center gap-1.5 ${
+                  isSelected
+                    ? 'glass-light-pill-active border-cyan-400 text-cyan-300 shadow-sm'
+                    : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D]'
+                }`}
+              >
+                <span>{orig.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 5. Streaming Availability */}
+      <div className="space-y-3">
+        <label className="text-xs font-bold text-[#F8FAFC] flex items-center gap-1.5">
+          <Tv className="w-3.5 h-3.5 text-[#CBD5E1]" />
+          Filter by Streaming Platforms
+        </label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
           {STREAMING_PLATFORMS.map((p) => {
             const isSelected = filters.streaming_providers.includes(p.code);
             return (
               <button
                 key={p.code}
                 onClick={() => togglePlatform(p.code)}
-                className={`p-2 rounded-xl text-xs border transition cursor-pointer font-medium ${
+                className={`p-2.5 rounded-2xl text-xs transition cursor-pointer font-bold border ${
                   isSelected
-                    ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-bold'
-                    : 'bg-white/80 border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'glass-light-pill-active border-cyan-400 text-cyan-300 shadow-sm'
+                    : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D]'
                 }`}
               >
                 {p.label}
@@ -180,10 +237,10 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
       </div>
 
       {/* Strict UNKNOWN Defense Notice */}
-      <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80 text-[11px] text-slate-600 flex items-start gap-2.5">
-        <ShieldAlert className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+      <div className="p-3.5 rounded-2xl glass-light-inner text-[11px] text-[#CBD5E1] flex items-start gap-2.5 border-[#29344D]">
+        <ShieldAlert className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
         <div>
-          <strong className="text-slate-800">UNKNOWN-Metadata Defense Active:</strong> Titles missing verified trigger data are strictly excluded whenever any trigger filter is set.
+          <strong className="text-[#F8FAFC]">UNKNOWN-Metadata Defense Active:</strong> Titles missing verified trigger data are strictly excluded whenever any trigger filter is set.
         </div>
       </div>
     </div>

@@ -1033,6 +1033,327 @@ SEED_MOVIES = [
             {"warning_code": "violence", "status": "PRESENT"}
         ],
         "platforms": ["free"]
+    },
+    # =========================================================================
+    # --- SECTION F: HORROR MASTERPIECES ---
+    # =========================================================================
+    {
+        "id": "m_horr_01",
+        "title": "Annabelle",
+        "release_year": 2014,
+        "runtime_minutes": 99,
+        "origin": "Hollywood",
+        "synopsis": "A couple begins to experience terrifying supernatural occurrences involving a vintage doll shortly after their home is invaded by a satanic cult.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BOTOWX3GFEtE3NjEtYzg2LTljNDYtNjA4Njc5MDM0YzVjXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+        "valence_score": -0.85,
+        "arousal_score": 0.92,
+        "ending_tone": "chilling and sinister",
+        "popularity_score": 8.7,
+        "genres": ["Horror", "Mystery", "Thriller"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"},
+            {"warning_code": "panic_attacks", "status": "PRESENT"}
+        ],
+        "platforms": ["netflix", "prime"]
+    },
+    {
+        "id": "m_horr_02",
+        "title": "The Conjuring",
+        "release_year": 2013,
+        "runtime_minutes": 112,
+        "origin": "Hollywood",
+        "synopsis": "Paranormal investigators Ed and Lorraine Warren work to help a family terrorized by a dark presence in their Rhode Island farmhouse.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BMTM3NjA1NDMyMV5BMl5BanBnXkFtZTcwMDQzNDMzOQ@@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+        "valence_score": -0.80,
+        "arousal_score": 0.90,
+        "ending_tone": "relentlessly haunting and triumphant",
+        "popularity_score": 9.3,
+        "genres": ["Horror", "Mystery", "Thriller"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"},
+            {"warning_code": "panic_attacks", "status": "PRESENT"}
+        ],
+        "platforms": ["netflix", "prime"]
+    },
+    {
+        "id": "m_horr_03",
+        "title": "Hereditary",
+        "release_year": 2018,
+        "runtime_minutes": 127,
+        "origin": "Hollywood",
+        "synopsis": "A grieving family is haunted by tragic and disturbing occurrences after the death of their secretive grandmother.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BOTU5MDg3OGItZWQ1Ny00ZGVmLWJmOWUtMzIzMzQ4MmYwNmVkXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+        "valence_score": -0.88,
+        "arousal_score": 0.85,
+        "ending_tone": "deeply traumatic and horrifying",
+        "popularity_score": 8.9,
+        "genres": ["Horror", "Drama", "Mystery"],
+        "content_warnings": [
+            {"warning_code": "grief_loss", "status": "PRESENT"},
+            {"warning_code": "violence", "status": "PRESENT"},
+            {"warning_code": "self_harm", "status": "PRESENT"}
+        ],
+        "platforms": ["prime"]
+    },
+    {
+        "id": "m_horr_04",
+        "title": "A Quiet Place",
+        "release_year": 2018,
+        "runtime_minutes": 90,
+        "origin": "Hollywood",
+        "synopsis": "In a post-apocalyptic world, a family is forced to live in absolute silence while hiding from monsters with ultra-sensitive hearing.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BMjI0MDMzNTQ0Ml5BMl5BanBnXkFtZTgwMTM5NzM3NDM@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+        "valence_score": -0.65,
+        "arousal_score": 0.88,
+        "ending_tone": "tense and empowering",
+        "popularity_score": 8.9,
+        "genres": ["Horror", "Sci-Fi", "Thriller"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"},
+            {"warning_code": "panic_attacks", "status": "PRESENT"}
+        ],
+        "platforms": ["prime", "netflix"]
+    },
+    {
+        "id": "m_horr_05",
+        "title": "Tumbbad",
+        "release_year": 2018,
+        "runtime_minutes": 104,
+        "origin": "Bollywood",
+        "synopsis": "A mythological horror tale revolving around the consequences of boundless human greed and a cursed primordial demon god Hastar in colonial Maharashtra.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BYmQxNmU4AC1tOTQ4Ni00YmU2LWExYjEtMmZmYjE4YTk5MGZlXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": -0.72,
+        "arousal_score": 0.86,
+        "ending_tone": "mythic dread and moral reckoning",
+        "popularity_score": 9.2,
+        "genres": ["Horror", "Fantasy", "Drama"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"}
+        ],
+        "platforms": ["prime"]
+    },
+    {
+        "id": "m_horr_06",
+        "title": "Stree",
+        "release_year": 2018,
+        "runtime_minutes": 128,
+        "origin": "Bollywood",
+        "synopsis": "In the small town of Chanderi, the men live in fear of an evil spirit named Stree who abducts men during festival nights.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BYWI0NDgzZGUtZjc5Ny00OTlhLWI0NWUtMmFhN2U5OWY4YmVkXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": 0.20,
+        "arousal_score": 0.75,
+        "ending_tone": "witty, spooky and feminist",
+        "popularity_score": 8.8,
+        "genres": ["Comedy", "Horror"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "ABSENT"}
+        ],
+        "platforms": ["netflix", "prime"]
+    },
+    # =========================================================================
+    # --- SECTION G: BOLLYWOOD (HINDI CINEMA) MASTERPIECES ---
+    # =========================================================================
+    {
+        "id": "m_bolly_01",
+        "title": "3 Idiots",
+        "release_year": 2009,
+        "runtime_minutes": 170,
+        "origin": "Bollywood",
+        "synopsis": "Two friends embark on a quest for a lost buddy who inspired them to think independently and follow their true passion in an oppressive academic world.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BNTkyOGVjMGEtNmQzZi00NzFlLTlhOWQtODYyMDc2ZGJmYzFhXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": 0.88,
+        "arousal_score": 0.65,
+        "ending_tone": "joyous, triumphant and deeply inspiring",
+        "popularity_score": 9.6,
+        "genres": ["Comedy", "Drama"],
+        "content_warnings": [
+            {"warning_code": "self_harm", "status": "ABSENT"},
+            {"warning_code": "violence", "status": "ABSENT"}
+        ],
+        "platforms": ["prime", "netflix"]
+    },
+    {
+        "id": "m_bolly_02",
+        "title": "Andhadhun",
+        "release_year": 2018,
+        "runtime_minutes": 139,
+        "origin": "Bollywood",
+        "synopsis": "A series of mysterious events change the life of a seemingly blind pianist who must now report a crime that he never actually saw.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BMzRkNjFkYjQtOTY0Yi00ZTBhLTk4YjEtNjExMjkwYmI4YTBkXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": -0.15,
+        "arousal_score": 0.82,
+        "ending_tone": "wickedly clever, dark and cynical",
+        "popularity_score": 9.1,
+        "genres": ["Crime", "Thriller", "Comedy"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"}
+        ],
+        "platforms": ["netflix"]
+    },
+    {
+        "id": "m_bolly_03",
+        "title": "Dangal",
+        "release_year": 2016,
+        "runtime_minutes": 161,
+        "origin": "Bollywood",
+        "synopsis": "Former wrestler Mahavir Singh Phogat trains his daughters Geeta and Babita to become world-class wrestlers, shattering gender stereotypes.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BMTQ4MzQzMzM2Nl5BMl5BanBnXkFtZTgwMTQ1NzU3MDI@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+        "valence_score": 0.82,
+        "arousal_score": 0.80,
+        "ending_tone": "empowering and patriotic",
+        "popularity_score": 9.4,
+        "genres": ["Action", "Drama"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "ABSENT"}
+        ],
+        "platforms": ["netflix"]
+    },
+    {
+        "id": "m_bolly_04",
+        "title": "Zindagi Na Milegi Dobara",
+        "release_year": 2011,
+        "runtime_minutes": 155,
+        "origin": "Bollywood",
+        "synopsis": "Three lifelong friends turn an overdue vacation into a road trip through Spain where each chooses a perilous sport to conquer their deepest fears.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BZGFmMjM5OWMtZTRiNC00ODhlLThlYTItZDU3MTQxNTVmNTM3XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": 0.90,
+        "arousal_score": 0.55,
+        "ending_tone": "liberating, philosophical and ecstatic",
+        "popularity_score": 9.2,
+        "genres": ["Comedy", "Drama", "Romance"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "ABSENT"}
+        ],
+        "platforms": ["netflix", "prime"]
+    },
+    {
+        "id": "m_bolly_05",
+        "title": "Dilwale Dulhania Le Jayenge",
+        "release_year": 1995,
+        "runtime_minutes": 189,
+        "origin": "Bollywood",
+        "synopsis": "When Raj meets Simran in Europe, it isn't love at first sight, but when he learns of her arranged marriage in Punjab, he journeys to win over her traditional father.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BMDQ2ZmE2NTMtZWY3NC00MS04LWIxYWEtNmQ3MDg2ZGU4N2ZkXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": 0.88,
+        "arousal_score": 0.45,
+        "ending_tone": "timeless romance, warmth and celebration",
+        "popularity_score": 9.4,
+        "genres": ["Drama", "Romance"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "ABSENT"}
+        ],
+        "platforms": ["prime"]
+    },
+    # =========================================================================
+    # --- SECTION H: TOLLYWOOD (SOUTH INDIAN CINEMA) MASTERPIECES ---
+    # =========================================================================
+    {
+        "id": "m_tolly_01",
+        "title": "RRR",
+        "release_year": 2022,
+        "runtime_minutes": 187,
+        "origin": "Tollywood",
+        "synopsis": "A fearless revolutionary and an officer in the British force develop an unbreakable bond before discovering each other's secret identities in pre-independence India.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyYTEtMDc5Y2E5NjgzZmFiXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": 0.86,
+        "arousal_score": 0.96,
+        "ending_tone": "euphoric, adrenaline-fueled and brotherly",
+        "popularity_score": 9.7,
+        "genres": ["Action", "Drama"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"}
+        ],
+        "platforms": ["netflix"]
+    },
+    {
+        "id": "m_tolly_02",
+        "title": "Baahubali: The Beginning",
+        "release_year": 2015,
+        "runtime_minutes": 159,
+        "origin": "Tollywood",
+        "synopsis": "In the kingdom of Mahishmati, a young man raised by villagers learns about his royal heritage and the tragic betrayal of his heroic father.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BYWVlMjVhZWYtNWViNC00ODFkLTk1MmItYjU1MDY5ZDdhMTU3XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": 0.78,
+        "arousal_score": 0.92,
+        "ending_tone": "monumental cliffhanger and grandeur",
+        "popularity_score": 9.4,
+        "genres": ["Action", "Drama", "Fantasy"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"}
+        ],
+        "platforms": ["netflix", "prime"]
+    },
+    {
+        "id": "m_tolly_03",
+        "title": "Baahubali 2: The Conclusion",
+        "release_year": 2017,
+        "runtime_minutes": 167,
+        "origin": "Tollywood",
+        "synopsis": "When Shiva, the son of Bahubali, learns about his heritage, he begins to seek answers and avenge his father's demise against the tyrant Bhallaladeva.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BNTI2YTI0MmItNGM1OC00ZDEzLTg1MmYtMmY4Y2M3YTQ1ZWRkXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": 0.84,
+        "arousal_score": 0.94,
+        "ending_tone": "epic justice and glorious emotional catharsis",
+        "popularity_score": 9.5,
+        "genres": ["Action", "Drama", "Fantasy"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"}
+        ],
+        "platforms": ["netflix", "prime"]
+    },
+    {
+        "id": "m_tolly_04",
+        "title": "Pushpa: The Rise",
+        "release_year": 2021,
+        "runtime_minutes": 179,
+        "origin": "Tollywood",
+        "synopsis": "A red sandalwood smuggler rises through the ranks of an illegal syndicate, confronting police forces and ruthless rivals in the Seshachalam hills.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BMmQ4YmM3NjgtNTExNC00ZTZmLWEwNTItMWQ3MmI5YzNmN2MzXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": 0.45,
+        "arousal_score": 0.90,
+        "ending_tone": "swaggering, rebellious and defiant",
+        "popularity_score": 9.2,
+        "genres": ["Action", "Crime", "Drama"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"}
+        ],
+        "platforms": ["prime"]
+    },
+    {
+        "id": "m_tolly_05",
+        "title": "Eega",
+        "release_year": 2012,
+        "runtime_minutes": 145,
+        "origin": "Tollywood",
+        "synopsis": "A murdered man is reincarnated as a common housefly and seeks to protect the woman he loves and avenge his death against an arrogant millionaire.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BMTY3NTY0MzgtOGFhMy00MWU5LTg5NTctOTU5NTgyMjEyMmY2XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": 0.65,
+        "arousal_score": 0.85,
+        "ending_tone": "triumphantly inventive, witty and romantic",
+        "popularity_score": 9.0,
+        "genres": ["Action", "Comedy", "Fantasy", "Romance"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"}
+        ],
+        "platforms": ["prime", "netflix"]
+    },
+    {
+        "id": "m_tolly_06",
+        "title": "Kantara",
+        "release_year": 2022,
+        "runtime_minutes": 148,
+        "origin": "Tollywood",
+        "synopsis": "When greed paves the way for betrayal and murder, a young tribal champion invokes ancestral spirits (Daiva) to defend his indigenous forest culture.",
+        "poster_url": "https://m.media-amazon.com/images/M/MV5BNjQzYTI3M2QtZWU5MS00Zjc0LWE0NWYtYTlkMmMzMTY4NGMwXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+        "valence_score": -0.20,
+        "arousal_score": 0.92,
+        "ending_tone": "visceral, divine possession and primal energy",
+        "popularity_score": 9.3,
+        "genres": ["Action", "Drama", "Thriller"],
+        "content_warnings": [
+            {"warning_code": "violence", "status": "PRESENT"}
+        ],
+        "platforms": ["netflix", "prime"]
     }
 ]
 
@@ -1045,7 +1366,27 @@ def seed_database(db: Session):
     genre_cache = {g.name: g for g in db.query(Genre).all()}
 
     for item in SEED_MOVIES:
+        origin_val = item.get("origin")
+        if not origin_val:
+            mid = item["id"]
+            if mid.startswith("m_kd_"):
+                origin_val = "Korean"
+            elif mid.startswith("m_jd_"):
+                origin_val = "Japanese"
+            elif mid.startswith("m_cd_"):
+                origin_val = "Asian"
+            elif mid.startswith("m_bolly_"):
+                origin_val = "Bollywood"
+            elif mid.startswith("m_tolly_"):
+                origin_val = "Tollywood"
+            else:
+                origin_val = "Hollywood"
+
         if item["id"] in existing_ids:
+            # Backfill origin if missing
+            existing_movie = db.query(MovieTitle).filter(MovieTitle.id == item["id"]).first()
+            if existing_movie and not existing_movie.origin:
+                existing_movie.origin = origin_val
             continue
 
         movie = MovieTitle(
@@ -1055,6 +1396,7 @@ def seed_database(db: Session):
             runtime_minutes=item["runtime_minutes"],
             synopsis=item["synopsis"],
             poster_url=item["poster_url"],
+            origin=origin_val,
             valence_score=item["valence_score"],
             arousal_score=item["arousal_score"],
             valence_arousal_source="editorial_curated",

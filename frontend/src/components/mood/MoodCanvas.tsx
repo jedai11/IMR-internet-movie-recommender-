@@ -68,16 +68,16 @@ export const MoodCanvas: React.FC<Props> = ({ coordinates, onChange }) => {
   const topPercent = ((1 - coordinates.arousal) / 2) * 100;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3.5">
       <div className="flex items-center justify-between text-xs">
-        <span className="font-bold text-slate-800 flex items-center gap-1.5">
-          <Crosshair className="w-3.5 h-3.5 text-indigo-600" />
+        <span className="font-bold text-[#F8FAFC] flex items-center gap-1.5">
+          <Crosshair className="w-3.5 h-3.5 text-cyan-400" />
           Circumplex 2D Affect Space
         </span>
-        <div className="flex items-center gap-2 font-mono text-[11px] text-slate-700 bg-white/80 px-2.5 py-1 rounded-lg border border-slate-200/80 shadow-sm">
-          <span>Valence: <strong>{coordinates.valence > 0 ? `+${coordinates.valence}` : coordinates.valence}</strong></span>
-          <span className="text-slate-300">|</span>
-          <span>Arousal: <strong>{coordinates.arousal > 0 ? `+${coordinates.arousal}` : coordinates.arousal}</strong></span>
+        <div className="flex items-center gap-2 font-mono text-[11px] text-[#CBD5E1] glass-light-pill px-3 py-1 rounded-xl border-[#29344D]">
+          <span>Valence: <strong className="text-[#F8FAFC]">{coordinates.valence > 0 ? `+${coordinates.valence}` : coordinates.valence}</strong></span>
+          <span className="text-slate-600">|</span>
+          <span>Arousal: <strong className="text-[#F8FAFC]">{coordinates.arousal > 0 ? `+${coordinates.arousal}` : coordinates.arousal}</strong></span>
         </div>
       </div>
 
@@ -85,33 +85,33 @@ export const MoodCanvas: React.FC<Props> = ({ coordinates, onChange }) => {
         ref={containerRef}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        className="relative w-full aspect-square max-w-[340px] mx-auto rounded-3xl bg-white/80 backdrop-blur-xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.05)] overflow-hidden cursor-crosshair select-none touch-none"
+        className="relative w-full aspect-square max-w-[340px] mx-auto rounded-3xl glass-light-panel overflow-hidden cursor-crosshair select-none touch-none shadow-[0_12px_36px_rgba(0,0,0,0.6),inset_0_1px_2px_rgba(255,255,255,0.08)] border-[#29344D]"
       >
-        {/* Soft Quadrant Pastels */}
+        {/* Soft Quadrant Pastels on Dark Glass */}
         {/* Top-Right: Joy (Warm Peach / Amber) */}
-        <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-amber-500/[0.08] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-amber-500/[0.14] pointer-events-none" />
         {/* Bottom-Right: Serene (Fresh Sage) */}
-        <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-emerald-500/[0.08] pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-emerald-500/[0.14] pointer-events-none" />
         {/* Bottom-Left: Sadness / Depressed (Muted Sky) */}
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-sky-500/[0.08] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-sky-500/[0.14] pointer-events-none" />
         {/* Top-Left: Anxiety / Agitated (Dusty Lavender Rose) */}
-        <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-purple-500/[0.08] pointer-events-none" />
+        <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-purple-500/[0.14] pointer-events-none" />
 
         {/* Center Axes */}
-        <div className="absolute inset-y-0 left-1/2 w-[1px] bg-slate-300/60 pointer-events-none" />
-        <div className="absolute inset-x-0 top-1/2 h-[1px] bg-slate-300/60 pointer-events-none" />
+        <div className="absolute inset-y-0 left-1/2 w-[1px] bg-[#29344D] pointer-events-none" />
+        <div className="absolute inset-x-0 top-1/2 h-[1px] bg-[#29344D] pointer-events-none" />
 
-        {/* Quadrant Micro-labels */}
-        <span className="absolute top-3 right-3 text-[10px] font-bold text-amber-700 uppercase tracking-wider pointer-events-none bg-amber-50/80 px-2 py-0.5 rounded-full border border-amber-200/50">
+        {/* Quadrant Micro-labels (Glass Pills) */}
+        <span className="absolute top-3 right-3 text-[10px] font-bold text-amber-300 uppercase tracking-wider pointer-events-none glass-light-pill px-2.5 py-0.5 rounded-full border-[#29344D] shadow-sm bg-amber-950/40">
           Euphoric / Joy
         </span>
-        <span className="absolute bottom-3 right-3 text-[10px] font-bold text-emerald-700 uppercase tracking-wider pointer-events-none bg-emerald-50/80 px-2 py-0.5 rounded-full border border-emerald-200/50">
+        <span className="absolute bottom-3 right-3 text-[10px] font-bold text-emerald-300 uppercase tracking-wider pointer-events-none glass-light-pill px-2.5 py-0.5 rounded-full border-[#29344D] shadow-sm bg-emerald-950/40">
           Calm / Peaceful
         </span>
-        <span className="absolute bottom-3 left-3 text-[10px] font-bold text-sky-700 uppercase tracking-wider pointer-events-none bg-sky-50/80 px-2 py-0.5 rounded-full border border-sky-200/50">
+        <span className="absolute bottom-3 left-3 text-[10px] font-bold text-sky-300 uppercase tracking-wider pointer-events-none glass-light-pill px-2.5 py-0.5 rounded-full border-[#29344D] shadow-sm bg-sky-950/40">
           Sad / Reflective
         </span>
-        <span className="absolute top-3 left-3 text-[10px] font-bold text-purple-700 uppercase tracking-wider pointer-events-none bg-purple-50/80 px-2 py-0.5 rounded-full border border-purple-200/50">
+        <span className="absolute top-3 left-3 text-[10px] font-bold text-purple-300 uppercase tracking-wider pointer-events-none glass-light-pill px-2.5 py-0.5 rounded-full border-[#29344D] shadow-sm bg-purple-950/40">
           Tense / Anxious
         </span>
 
@@ -121,15 +121,15 @@ export const MoodCanvas: React.FC<Props> = ({ coordinates, onChange }) => {
           style={{ left: `${leftPercent}%`, top: `${topPercent}%` }}
         >
           <div className="relative flex items-center justify-center">
-            <span className="absolute w-8 h-8 rounded-full bg-indigo-500/20 animate-ping" />
-            <div className="w-5 h-5 rounded-full bg-indigo-600 border-2 border-white shadow-[0_2px_10px_rgba(79,70,229,0.5)] flex items-center justify-center">
-              <Sparkles className="w-2.5 h-2.5 text-white" />
+            <span className="absolute w-9 h-9 rounded-full bg-cyan-500/30 animate-ping" />
+            <div className="w-6 h-6 rounded-full bg-cyan-500 border-2 border-white shadow-[0_4px_14px_rgba(0,180,216,0.6)] flex items-center justify-center">
+              <Sparkles className="w-3 h-3 text-[#080B16]" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-[11px] text-slate-500 px-1 font-medium">
+      <div className="flex items-center justify-between text-[11px] text-[#CBD5E1] px-1 font-semibold">
         <span>← Unpleasant (-1)</span>
         <span>Drag circle anywhere to feel</span>
         <span>Pleasant (+1) →</span>

@@ -2,10 +2,15 @@
   "name": "movie-recommendation-system",
   "version": "1.0.0",
   "scripts": {
-    "dev": "npm --prefix frontend run dev",
+    "dev": "concurrently -n \"backend,frontend\" -c \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "node dev_backend.js",
+    "dev:frontend": "npm --prefix frontend run dev",
     "build": "npm --prefix frontend run build"
   },
   "dependencies": {
     "@google/genai": "^3.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.7"
   }
 }

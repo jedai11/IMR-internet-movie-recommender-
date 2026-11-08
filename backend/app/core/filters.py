@@ -24,6 +24,7 @@ def apply_hard_filters(
         "seen": 0,
         "runtime": 0,
         "genre": 0,
+        "origin": 0,
         "trigger_present": 0,
         "trigger_unknown": 0,
         "streaming": 0
@@ -33,6 +34,8 @@ def apply_hard_filters(
     excluded_genres_lower = {g.strip().lower() for g in filters.excluded_genres if g.strip()}
     excluded_warnings_lower = {w.strip().lower() for w in filters.excluded_warnings if w.strip()}
     streaming_providers_lower = {p.strip().lower() for p in filters.streaming_providers if p.strip()}
+    requested_origins_lower = {o.strip().lower() for o in filters.origins if o.strip()}
+    filter_by_origin = bool(requested_origins_lower and "all" not in requested_origins_lower)
 
     for movie in candidates:
         # 1. Seen filter
@@ -83,6 +86,13 @@ def apply_hard_filters(
             available_platforms = {av.platform.lower() for av in movie.availabilities}
             if not available_platforms.intersection(streaming_providers_lower):
                 dropped_reasons["streaming"] += 1
+                continue
+
+        # 5b. Origin / Cinema Industry Filter (Hollywood, Bollywood, Tollywood, Korean, Japanese, European, etc.)
+        if filter_by_origin:
+            mov_origin = (getattr(movie, "origin", None) or "Hollywood").strip().lower()
+            if mov_origin not in requested_origins_lower:
+                dropped_reasons["origin"] += 1
                 continue
 
         # Survived all hard exclusion gates

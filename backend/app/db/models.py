@@ -31,6 +31,7 @@ class MovieTitle(Base):
     valence_arousal_confidence = Column(Float, default=0.90)
     ending_tone = Column(String, default="uplifting")
     popularity_score = Column(Float, default=7.5)
+    origin = Column(String, default="Hollywood", index=True)
 
     # Relationships
     genres = relationship("Genre", secondary=title_genres_table, back_populates="titles")

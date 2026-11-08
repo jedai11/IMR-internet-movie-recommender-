@@ -29,6 +29,7 @@ def get_catalog_titles(db: Session = Depends(get_db)):
             "poster_url": f"/api/catalog/poster/{m.id}",
             "valence": m.valence_score,
             "arousal": m.arousal_score,
+            "origin": getattr(m, "origin", "Hollywood") or "Hollywood",
             "genres": [g.name for g in m.genres],
             "platforms": [av.platform for av in m.availabilities],
             "warnings": [

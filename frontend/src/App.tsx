@@ -42,11 +42,24 @@ import { FilterDrawer } from './components/filters/FilterDrawer';
 import { MovieCard } from './components/results/MovieCard';
 import { WhyThisModal } from './components/results/WhyThisModal';
 
-const GENRE_KEYWORD_MAP: Record<string, string> = {
+const GENRE_KEYWORD_MAP: Record<string, string | string[]> = {
+  'night thriller': ['Thriller', 'Night-Movie'],
+  'night-thriller': ['Thriller', 'Night-Movie'],
+  'night movie': 'Night-Movie',
+  'night-movie': 'Night-Movie',
+  'night cinema': 'Night-Movie',
+  'late night': 'Night-Movie',
+  'midnight': 'Night-Movie',
+  'noir': 'Night-Movie',
+  'neo-noir': 'Night-Movie',
+  'night': 'Night-Movie',
   'thriller': 'Thriller', 'thrillers': 'Thriller', 'suspense': 'Thriller', 'thrilling': 'Thriller',
   'comedy': 'Comedy', 'comedies': 'Comedy', 'funny': 'Comedy', 'humor': 'Comedy', 'hilarious': 'Comedy', 'romcom': 'Comedy',
   'romance': 'Romance', 'romantic': 'Romance', 'love story': 'Romance',
-  'horror': 'Horror', 'scary': 'Horror', 'spooky': 'Horror',
+  'some kind of love': 'Romance', 'kind of love': 'Romance', 'with love': 'Romance', 'love': 'Romance',
+  'horror': 'Horror', 'scary': 'Horror', 'spooky': 'Horror', 'frightening': 'Horror',
+  'supernatural': 'Horror', 'slasher': 'Horror', 'creepy': 'Horror', 'ghost': 'Horror',
+  'demon': 'Horror', 'possession': 'Horror', 'haunted': 'Horror',
   'drama': 'Drama', 'dramatic': 'Drama',
   'action': 'Action', 'action-packed': 'Action',
   'adventure': 'Adventure',
@@ -89,14 +102,39 @@ const POPULAR_MOVIES_MAP: Record<string, { title: string; genres: string[] }> = 
   'eternal sunshine': { title: 'Eternal Sunshine of the Spotless Mind', genres: ['Drama', 'Romance', 'Sci-Fi'] },
   'spirited away': { title: 'Spirited Away', genres: ['Animation', 'Adventure', 'Fantasy'] },
   'goblin': { title: 'Goblin', genres: ['Drama', 'Romance', 'Fantasy'] },
-  'titanic': { title: 'Titanic', genres: ['Drama', 'Romance'] }
+  'titanic': { title: 'Titanic', genres: ['Drama', 'Romance'] },
+  // Horror
+  'annabelle': { title: 'Annabelle', genres: ['Horror', 'Mystery', 'Thriller'] },
+  'the conjuring': { title: 'The Conjuring', genres: ['Horror', 'Mystery', 'Thriller'] },
+  'conjuring': { title: 'The Conjuring', genres: ['Horror', 'Mystery', 'Thriller'] },
+  'hereditary': { title: 'Hereditary', genres: ['Horror', 'Drama', 'Mystery'] },
+  'a quiet place': { title: 'A Quiet Place', genres: ['Horror', 'Sci-Fi', 'Thriller'] },
+  'insidious': { title: 'Insidious', genres: ['Horror', 'Mystery', 'Thriller'] },
+  'tumbbad': { title: 'Tumbbad', genres: ['Horror', 'Fantasy', 'Drama'] },
+  'stree': { title: 'Stree', genres: ['Comedy', 'Horror'] },
+  // Bollywood & Indian Cinema
+  '3 idiots': { title: '3 Idiots', genres: ['Comedy', 'Drama'] },
+  'andhadhun': { title: 'Andhadhun', genres: ['Crime', 'Thriller', 'Comedy'] },
+  'dangal': { title: 'Dangal', genres: ['Action', 'Drama'] },
+  'zindagi na milegi dobara': { title: 'Zindagi Na Milegi Dobara', genres: ['Comedy', 'Drama', 'Romance'] },
+  'dilwale dulhania le jayenge': { title: 'Dilwale Dulhania Le Jayenge', genres: ['Drama', 'Romance'] },
+  'gangs of wasseypur': { title: 'Gangs of Wasseypur', genres: ['Action', 'Crime', 'Drama'] },
+  // Tollywood
+  'rrr': { title: 'RRR', genres: ['Action', 'Drama'] },
+  'baahubali': { title: 'Baahubali: The Beginning', genres: ['Action', 'Drama', 'Fantasy'] },
+  'pushpa': { title: 'Pushpa: The Rise', genres: ['Action', 'Crime', 'Drama'] },
+  'eega': { title: 'Eega', genres: ['Action', 'Comedy', 'Fantasy', 'Romance'] },
+  'kantara': { title: 'Kantara', genres: ['Action', 'Drama', 'Thriller'] }
 };
 
 const SUGGESTIONS = [
-  "Loved Crash Landing on You, feeling exhausted after work, need something warm & comforting",
-  "Tense and overwhelmed, loved Parasite and Squid Game, recommend an intense thriller",
-  "Feeling nostalgic and contemplative, looking for gentle drama like Drive My Car or Departures",
-  "High energy and excited! Want mind-bending sci-fi action like Inception or The Matrix"
+  "Night thriller with some kind of love",
+  "Calm & peaceful evening, looking for soothing comfort like Drive My Car or Departures",
+  "Happy & energetic! Want upbeat optimism and fun comedy like Crash Landing on You",
+  "Angry & intense after a long day, need a gripping high-stakes thriller like Parasite",
+  "Sad & melancholic, looking for deep nostalgic cinema like In the Mood for Love",
+  "Romantic mood, looking for tender intimacy and love story like Before Sunrise",
+  "Focus & concentration, want disciplined balanced cinema like Oppenheimer"
 ];
 
 export function App() {
@@ -123,6 +161,7 @@ export function App() {
     max_runtime: undefined,
     excluded_genres: [],
     preferred_genres: [],
+    origins: [],
     excluded_warnings: [],
     streaming_providers: [],
     exclude_seen: true
@@ -163,9 +202,28 @@ export function App() {
 
     document.documentElement.style.setProperty('--theme-primary', theme.primaryHex);
     document.documentElement.style.setProperty('--theme-secondary', theme.secondaryHex);
+    document.documentElement.style.setProperty('--theme-accent', theme.accentHex);
+    document.documentElement.style.setProperty('--theme-bg', theme.backgroundHex);
+    document.documentElement.style.setProperty('--theme-text', theme.textHex);
     document.documentElement.style.setProperty('--theme-glow', theme.glowHex);
     document.documentElement.style.setProperty('--theme-bg-gradient-1', theme.bgGradient1);
     document.documentElement.style.setProperty('--theme-bg-gradient-2', theme.bgGradient2);
+    document.documentElement.style.setProperty('--theme-wcag-text-on-light', theme.wcagTextOnLight);
+    document.documentElement.style.setProperty('--theme-wcag-button-text', theme.wcagButtonText);
+
+    // Sync [data-mood] attribute for dynamic CSS mood morphing & glow
+    const moodKeyMap: Record<string, string> = {
+      'calm_peaceful': 'calm',
+      'happy_energetic': 'happy',
+      'angry_intense': 'angry',
+      'sad_melancholic': 'sad',
+      'romantic_love': 'romantic',
+      'focus_concentration': 'focus',
+      'excitement_adrenaline': 'adrenaline',
+      'neutral_minimal': 'neutral'
+    };
+    const moodAttr = moodKeyMap[theme.themeId] || 'neutral';
+    document.documentElement.setAttribute('data-mood', moodAttr);
   }, [pickerCoords, inferredTags, strategy]);
 
   // Live movie reference detection
@@ -190,7 +248,11 @@ export function App() {
     for (const [kw, genre] of Object.entries(GENRE_KEYWORD_MAP)) {
       const regex = new RegExp(`\\b${kw}\\b`, 'i');
       if (regex.test(lower)) {
-        found.add(genre);
+        if (Array.isArray(genre)) {
+          genre.forEach((g) => found.add(g));
+        } else {
+          found.add(genre);
+        }
       }
     }
     const refs = detectMovieReferencesRealtime(text);
@@ -313,12 +375,30 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col custom-scrollbar theme-transition">
+    <div className="min-h-screen flex flex-col custom-scrollbar theme-transition relative overflow-x-hidden">
+      {/* Dynamic Ambient Refraction Light Orbs (VisionOS / macOS style) */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div
+          className="ambient-orb ambient-orb-1"
+          style={{ background: currentTheme.primaryHex }}
+        />
+        <div
+          className="ambient-orb ambient-orb-2"
+          style={{ background: currentTheme.secondaryHex }}
+        />
+        <div
+          className="ambient-orb ambient-orb-3"
+          style={{ background: currentTheme.accentHex }}
+        />
+      </div>
+
       {/* EU AI Act Art. 50 Notice Banner */}
-      <ConsentNotice onOpenPrivacyModal={() => setPrivacyModalOpen(true)} />
+      <div className="relative z-50">
+        <ConsentNotice onOpenPrivacyModal={() => setPrivacyModalOpen(true)} />
+      </div>
 
       {/* Glassmorphic Navigation Header */}
-      <header className="border-b border-white/60 bg-white/70 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_20px_rgba(0,0,0,0.02)] theme-transition">
+      <header className="glass-light-header sticky top-0 z-40 theme-transition">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
@@ -331,11 +411,11 @@ export function App() {
               <Clapperboard className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="font-extrabold text-lg tracking-tight text-slate-900">
+              <span className="font-black text-lg tracking-tight text-[#F8FAFC]">
                 MoodReel
               </span>
               <span
-                className="hidden sm:inline-block ml-2 text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full border transition-all duration-700"
+                className="hidden sm:inline-block ml-2 text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full border transition-all duration-700 shadow-sm"
                 style={{
                   backgroundColor: currentTheme.badgeBg,
                   borderColor: currentTheme.badgeBorder,
@@ -350,32 +430,50 @@ export function App() {
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Gemini Integration Badge */}
             <div
-              className="px-2.5 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-emerald-200/80 bg-emerald-50 text-emerald-800 shadow-sm"
+              className="glass-light-pill px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 text-emerald-400 border-[#29344D]"
               title="Google Gemini AI is active for affective psychology NLP and movie genre analysis"
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
               <span className="hidden sm:inline font-mono text-[11px]">Gemini AI Active</span>
             </div>
 
-            {/* Chromotherapeutic UI Theme Indicator */}
+            {/* Dynamic Mood Palette Swatch Indicator with WCAG Compliance Tag */}
             <div
-              className="px-2.5 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all duration-700 shadow-sm"
+              className="glass-light-pill px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-2 transition-all duration-700 shadow-sm border-[#29344D]"
               style={{
-                backgroundColor: currentTheme.badgeBg,
                 borderColor: currentTheme.badgeBorder,
-                color: currentTheme.badgeText
+                color: '#F8FAFC'
               }}
-              title={currentTheme.objective}
+              title={`${currentTheme.name}: ${currentTheme.feeling} • WCAG 2.2 ${currentTheme.wcagLevel} compliant (${currentTheme.contrastRatioOnLight})`}
             >
-              <Palette className="w-3.5 h-3.5" />
-              <span className="hidden md:inline font-mono text-[11px]">{currentTheme.name}</span>
+              <div className="flex items-center -space-x-1">
+                <span
+                  className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
+                  style={{ backgroundColor: currentTheme.primaryHex }}
+                  title={`Primary: ${currentTheme.primaryHex}`}
+                />
+                <span
+                  className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
+                  style={{ backgroundColor: currentTheme.secondaryHex }}
+                  title={`Secondary: ${currentTheme.secondaryHex}`}
+                />
+                <span
+                  className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
+                  style={{ backgroundColor: currentTheme.accentHex }}
+                  title={`Accent: ${currentTheme.accentHex}`}
+                />
+              </div>
+              <span className="hidden md:inline font-mono text-[11px] text-[#F8FAFC]">{currentTheme.name}</span>
+              <span className="hidden lg:inline-block px-1.5 py-0.5 rounded-md bg-emerald-950/80 text-emerald-300 text-[9px] font-mono font-black border border-emerald-600/50">
+                WCAG {currentTheme.wcagLevel}
+              </span>
             </div>
 
             <button
               onClick={() => setPrivacyModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-white/80 hover:bg-white border border-slate-200/80 transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="glass-light-pill px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D] transition flex items-center gap-1.5 cursor-pointer"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
               <span className="hidden sm:inline">Privacy</span>
             </button>
 
@@ -383,7 +481,7 @@ export function App() {
               <button
                 onClick={handleClearSession}
                 title="Reset discovery session"
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition cursor-pointer"
+                className="glass-light-pill p-2 rounded-xl text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D] transition cursor-pointer"
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -393,7 +491,7 @@ export function App() {
       </header>
 
       {/* Main Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-10 space-y-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-10 space-y-12 relative z-10">
         
         {/* ========================================================================= */}
         {/* CENTER HERO SEARCH CAPSULE (Glass-Light Morphism)                        */}
@@ -402,21 +500,21 @@ export function App() {
           
           {/* Hero Headlines */}
           <div className="space-y-2">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#F8FAFC] drop-shadow-md">
               Discover Cinema Grounded in Your Mood
             </h1>
-            <p className="text-sm text-slate-500 max-w-xl mx-auto leading-relaxed">
+            <p className="text-sm text-[#CBD5E1] max-w-xl mx-auto leading-relaxed font-medium">
               Express your feelings, mention movies or dramas you love, or fine-tune your affective coordinates on Russell's Circumplex.
             </p>
           </div>
 
           {/* Central Glassmorphic Search Bar Capsule */}
-          <div className="bg-white/80 backdrop-blur-2xl border border-white rounded-3xl p-4 sm:p-5 shadow-[0_15px_45px_rgba(31,38,135,0.07)] ring-1 ring-black/[0.03] space-y-4 text-left transition-all">
+          <div className="glass-light-panel rounded-3xl p-5 sm:p-6 space-y-4 text-left transition-all relative">
             
             {/* Input Row */}
             <div className="relative flex items-start gap-3">
-              <div className="mt-2.5 text-indigo-600 shrink-0">
-                <Search className="w-5 h-5 text-indigo-600" />
+              <div className="mt-2.5 text-indigo-400 shrink-0">
+                <Search className="w-5 h-5 text-indigo-400" />
               </div>
 
               <div className="flex-1 space-y-2">
@@ -431,16 +529,16 @@ export function App() {
                   }}
                   placeholder="How are you feeling? e.g. Loved Parasite and Train to Busan, feeling exhausted after work, recommend an exciting thriller or K-drama..."
                   rows={2}
-                  className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 text-sm sm:text-base font-medium focus:outline-none resize-none leading-relaxed"
+                  className="w-full bg-transparent text-[#F8FAFC] placeholder:text-slate-400 text-sm sm:text-base font-medium focus:outline-none resize-none leading-relaxed"
                 />
 
                 {/* Real-time Analyzed Badges */}
                 {(referencedMovies.length > 0 || detectedGenres.length > 0) && (
-                  <div className="flex items-center gap-1.5 flex-wrap pt-1 border-t border-slate-100">
+                  <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-[#29344D]">
                     {referencedMovies.map((ref) => (
                       <span
                         key={ref.title}
-                        className="px-2.5 py-0.5 rounded-full text-xs font-bold border border-amber-300 bg-amber-50 text-amber-900 flex items-center gap-1 shadow-sm"
+                        className="glass-light-pill px-3 py-1 rounded-full text-xs font-bold text-amber-300 flex items-center gap-1 border-amber-500/40 bg-amber-950/40"
                       >
                         🎬 {ref.title}
                         <span className="opacity-70 font-normal text-[10px]">({ref.genres.join(', ')})</span>
@@ -449,7 +547,7 @@ export function App() {
                     {detectedGenres.map((g) => (
                       <span
                         key={g}
-                        className="px-2.5 py-0.5 rounded-full text-xs font-bold border border-indigo-200 bg-indigo-50 text-indigo-800 shadow-sm"
+                        className="glass-light-pill px-3 py-1 rounded-full text-xs font-bold text-cyan-300 border-cyan-500/40 bg-cyan-950/40"
                       >
                         🎯 {g}
                       </span>
@@ -461,7 +559,7 @@ export function App() {
               {freeText.trim() && (
                 <button
                   onClick={() => handleTextChange('')}
-                  className="text-slate-400 hover:text-slate-700 p-1.5 rounded-full hover:bg-slate-100 transition mt-1"
+                  className="glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] p-1.5 rounded-full transition mt-1"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -469,16 +567,16 @@ export function App() {
             </div>
 
             {/* Quick Action Ribbon */}
-            <div className="flex items-center justify-between flex-wrap gap-2 pt-3 border-t border-slate-100/90">
-              <div className="flex items-center gap-1.5 flex-wrap">
+            <div className="flex items-center justify-between flex-wrap gap-2 pt-3 border-t border-[#29344D]">
+              <div className="flex items-center gap-2 flex-wrap">
                 {/* 2D Mood Canvas Toggle */}
                 <button
                   type="button"
                   onClick={() => setActiveTab(activeTab === 'canvas' ? 'none' : 'canvas')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 cursor-pointer shadow-sm ${
+                  className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'canvas'
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-600/20'
-                      : 'bg-white/90 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-white'
+                      ? 'bg-indigo-600 text-white border border-indigo-500 shadow-md shadow-indigo-600/30'
+                      : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC]'
                   }`}
                 >
                   <Crosshair className="w-3.5 h-3.5" />
@@ -492,10 +590,10 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setActiveTab(activeTab === 'presets' ? 'none' : 'presets')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 cursor-pointer shadow-sm ${
+                  className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'presets'
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-600/20'
-                      : 'bg-white/90 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-white'
+                      ? 'bg-indigo-600 text-white border border-indigo-500 shadow-md shadow-indigo-600/30'
+                      : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC]'
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
@@ -506,10 +604,10 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setActiveTab(activeTab === 'strategy' ? 'none' : 'strategy')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 cursor-pointer shadow-sm ${
+                  className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'strategy'
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-600/20'
-                      : 'bg-white/90 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-white'
+                      ? 'bg-indigo-600 text-white border border-indigo-500 shadow-md shadow-indigo-600/30'
+                      : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC]'
                   }`}
                 >
                   <Compass className="w-3.5 h-3.5" />
@@ -520,10 +618,10 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setActiveTab(activeTab === 'filters' ? 'none' : 'filters')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 cursor-pointer shadow-sm ${
+                  className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'filters'
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-600/20'
-                      : 'bg-white/90 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-white'
+                      ? 'bg-indigo-600 text-white border border-indigo-500 shadow-md shadow-indigo-600/30'
+                      : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC]'
                   }`}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -531,26 +629,27 @@ export function App() {
                 </button>
               </div>
 
-              {/* Primary Search / Discover Action Button */}
+              {/* Primary Search / Discover Action Button (WCAG 2.2 Compliant Contrast) */}
               <button
                 type="button"
                 onClick={() => handleDiscover()}
                 disabled={loading}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-2xl text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-95 ml-auto"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-2xl font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-95 ml-auto hover:brightness-110"
                 style={{
                   background: `linear-gradient(135deg, ${currentTheme.primaryHex}, ${currentTheme.secondaryHex})`,
-                  boxShadow: `0 6px 20px ${currentTheme.glowHex}`
+                  color: currentTheme.wcagButtonText,
+                  boxShadow: `0 6px 22px ${currentTheme.glowHex}`
                 }}
               >
                 {loading ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                    <RefreshCw className="w-4 h-4 animate-spin" style={{ color: currentTheme.wcagButtonText }} />
                     <span>Analyzing Affect...</span>
                   </>
                 ) : (
                   <>
                     <span>Discover Movies</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4" style={{ color: currentTheme.wcagButtonText }} />
                   </>
                 )}
               </button>
@@ -558,9 +657,9 @@ export function App() {
 
             {/* Expandable Interior Drawers */}
             {activeTab !== 'none' && (
-              <div className="pt-4 border-t border-slate-100 animate-in fade-in duration-200">
+              <div className="pt-4 border-t border-[#29344D] animate-in fade-in duration-200">
                 {activeTab === 'canvas' && (
-                  <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/70">
+                  <div className="p-4 sm:p-5 rounded-2xl glass-light-inner">
                     <MoodCanvas
                       coordinates={pickerCoords}
                       onChange={(coords) => setPickerCoords(coords)}
@@ -569,7 +668,7 @@ export function App() {
                 )}
 
                 {activeTab === 'presets' && (
-                  <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/70">
+                  <div className="p-4 sm:p-5 rounded-2xl glass-light-inner">
                     <EmotionPresets
                       currentCoordinates={pickerCoords}
                       onSelectPreset={(coords) => {
@@ -580,7 +679,7 @@ export function App() {
                 )}
 
                 {activeTab === 'strategy' && (
-                  <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/70">
+                  <div className="p-4 sm:p-5 rounded-2xl glass-light-inner">
                     <StrategySelector
                       strategy={strategy}
                       onChange={(strat) => setStrategy(strat)}
@@ -601,7 +700,7 @@ export function App() {
           {/* Inspirational Prompt Chips (Quick suggestions) */}
           {recommendations.length === 0 && !loading && (
             <div className="space-y-2 pt-2">
-              <span className="text-xs font-semibold text-slate-400">
+              <span className="text-xs font-semibold text-[#CBD5E1]">
                 Or click to explore common moods:
               </span>
               <div className="flex flex-wrap items-center justify-center gap-2">
@@ -612,7 +711,7 @@ export function App() {
                       setFreeText(s);
                       handleDiscover(s);
                     }}
-                    className="text-xs text-slate-600 hover:text-indigo-900 bg-white/70 hover:bg-white border border-slate-200/80 px-3 py-1.5 rounded-full transition shadow-sm text-left truncate max-w-md cursor-pointer"
+                    className="glass-light-pill text-xs text-[#CBD5E1] hover:text-[#F8FAFC] px-3.5 py-1.5 rounded-full text-left truncate max-w-md cursor-pointer border-[#29344D]"
                   >
                     ✨ {s}
                   </button>
@@ -629,8 +728,8 @@ export function App() {
           
           {/* Error Message */}
           {error && (
-            <div className="p-4 rounded-3xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-3 shadow-sm">
-              <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" />
+            <div className="p-4 rounded-3xl glass-light-panel border-rose-500/50 text-rose-300 text-xs font-semibold flex items-center gap-3 shadow-sm bg-rose-950/40">
+              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
               <span>{error}</span>
             </div>
           )}
@@ -645,9 +744,9 @@ export function App() {
 
           {/* Loading Indicator */}
           {loading && (
-            <div className="py-16 text-center space-y-3">
-              <RefreshCw className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
-              <p className="text-sm font-bold text-slate-700">
+            <div className="py-20 text-center space-y-4 glass-light-card rounded-3xl max-w-md mx-auto border-[#29344D]">
+              <RefreshCw className="w-9 h-9 animate-spin text-indigo-400 mx-auto" />
+              <p className="text-sm font-bold text-[#F8FAFC]">
                 Calculating Russell Circumplex Affect Vectors & Querying Catalog...
               </p>
             </div>
@@ -656,25 +755,25 @@ export function App() {
           {/* Results Grid */}
           {!loading && recommendations.length > 0 && !distressData && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-200/80">
+              <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-[#29344D]">
                 <div>
-                  <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-indigo-600" />
+                  <h2 className="text-xl font-black text-[#F8FAFC] flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-indigo-400" />
                     Recommended Cinema ({recommendations.length})
                   </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-[#CBD5E1] mt-0.5 font-medium">
                     Grounded math recommendations matching your exact affect and requested genres.
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
                   {detectedGenres.length > 0 && (
-                    <span className="text-xs font-bold text-indigo-800 bg-indigo-50 px-2.5 py-1 rounded-xl border border-indigo-200 shadow-sm">
+                    <span className="glass-light-pill text-xs font-bold text-cyan-300 px-3 py-1 rounded-xl border-cyan-500/40 bg-cyan-950/30">
                       Filtered: {detectedGenres.join(', ')}
                     </span>
                   )}
                   {activeTargetMood && (
-                    <span className="text-xs font-mono font-bold text-slate-700 bg-white/90 px-3 py-1 rounded-xl border border-slate-200 shadow-sm">
+                    <span className="glass-light-pill text-xs font-mono font-bold text-[#CBD5E1] px-3 py-1 rounded-xl border-[#29344D]">
                       Target: ({activeTargetMood.valence}, {activeTargetMood.arousal})
                     </span>
                   )}

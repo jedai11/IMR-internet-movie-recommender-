@@ -7,6 +7,7 @@ class FilterCriteria(BaseModel):
     min_runtime: Optional[int] = Field(default=None, ge=30, le=360)
     excluded_genres: List[str] = Field(default_factory=list)
     preferred_genres: List[str] = Field(default_factory=list, description="Preferred genres extracted semantically or explicitly selected")
+    origins: List[str] = Field(default_factory=list, description="Origins or cinema industries requested: hollywood, bollywood, tollywood, korean, japanese, etc.")
     # trigger codes: 'self_harm', 'sexual_violence', 'substance_abuse', 'grief_loss', 'panic_attacks', 'violence'
     excluded_warnings: List[str] = Field(default_factory=list)
     streaming_providers: List[str] = Field(default_factory=list) # e.g. ['netflix', 'prime', 'free']
@@ -36,6 +37,7 @@ class MovieRecommendation(BaseModel):
     release_year: int
     runtime_minutes: int
     genres: List[str]
+    origin: Optional[str] = Field(default="Hollywood", description="Origin/Cinema industry: Hollywood, Bollywood, Tollywood, Korean, etc.")
     poster_url: Optional[str] = None
     synopsis: Optional[str] = None
     streaming_platforms: List[str]
