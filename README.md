@@ -16,8 +16,7 @@ By leveraging an on-demand **FIFO Queue $\to$ Persistent SQLite $\to$ LIFO Stack
 - **Dynamic TMDB On-Demand Abstraction:** Fetches and enriches movies per genre dynamically on user demand, abstracting data through a FIFO ingestion queue into local storage.
 - **High-Performance LIFO Retrieval Stack:** Tracks user genre interactions and stores recent recommendations in a LIFO stack for rapid retrieval.
 - **Interactive Clickable Movie Cards:** Cards feature high-res poster art, runtime, release year, origin tags, fit percentage, and verified TMDB rating badges. Clicking opens a full transparency modal.
-- **Deep Transparency Modal ("Why this recommendation?"):** Displays affective coordinates, Euclidean distance math, LLM rationale, TMDB user score and vote counts, official YouTube trailer links, safety audit, and verified cover notes.
-- **Distress Safeguard Engine:** Immediately evaluates user reflections for crisis keywords and displays 24/7 confidential international helpline resources when needed.
+- **Deep Transparency Modal ("Why this recommendation?"):** Displays affective coordinates, Euclidean distance math, rationale, TMDB user score and vote counts, official YouTube trailer links, and filter audits.
 - **Chromotherapeutic Dynamic Theming:** The user interface dynamically shifts its luminous glassmorphic palette according to the user's emotional state.
 
 ---
@@ -33,18 +32,17 @@ flowchart TD
         FreeText["Free-Text Emotion Reflection"]
         Strat["Strategy Selector\n(Catharsis vs Shift Mode)"]
         Deck["Interactive Movie Cards\n(TMDB Badge, Runtime, Fit %)"]
-        Modal["Why This? Modal\n(TMDB Score, Backdrop, Trailer, Safety)"]
+        Modal["Why This? Modal\n(TMDB Score, Backdrop, Trailer)"]
     end
 
     subgraph API["FastAPI Pipeline (Port 8000)"]
-        Distress{"1. Distress Safeguard\nCheck (distress.py)"}
-        NLP["2. Affective NLP &\nGenre Extractor (llm_service.py)"]
-        Fusion["3. Confidence-Weighted\nModality Fusion (fusion.py)"]
-        ShiftEngine["4. Emotional Regulation\nShift Engine (shift.py)"]
-        FilterEngine["5. Hard Exclusion Engine\n(filters.py)"]
-        Ranker["6. Circumplex Distance Ranker\n& Cold-Start Weighting (ranking.py)"]
-        Rationale["7. Grounded Rationale &\nFront-Page Archival (llm_service.py)"]
-        TMDBService["8. TMDB Service &\nLocal Poster Cache (tmdb_service.py)"]
+        NLP["1. Affective NLP &\nGenre Extractor (llm_service.py)"]
+        Fusion["2. Confidence-Weighted\nModality Fusion (fusion.py)"]
+        ShiftEngine["3. Emotional Regulation\nShift Engine (shift.py)"]
+        FilterEngine["4. Hard Exclusion Engine\n(filters.py)"]
+        Ranker["5. Circumplex Distance Ranker\n& Cold-Start Weighting (ranking.py)"]
+        Rationale["6. Grounded Rationale &\nFront-Page Archival (llm_service.py)"]
+        TMDBService["7. TMDB Service &\nLocal Poster Cache (tmdb_service.py)"]
     end
 
     subgraph TMDBIntegration["TMDB On-Demand Stack & Queue Subsystem"]
@@ -61,8 +59,7 @@ flowchart TD
 
     Hero --> FreeText
     Presets --> Canvas
-    FreeText --> Distress
-    Distress -->|Clear| NLP
+    FreeText --> NLP
     Canvas --> Fusion
     NLP --> Fusion
     Fusion --> ShiftEngine
@@ -115,9 +112,9 @@ User Request (Genre / Mood)
 
 ### Key Highlights:
 1. **Zero Redundant Calls:** Once a genre's movies are abstracted into the local SQLite database and cached, subsequent recommendations use local data directly.
-2. **Resilient Network Client:** Built with `httpx` with automatic `curl.exe` fallback to ensure zero connection resets on Windows environments.
+2. **Resilient Network Client:** Built with `httpx` with automatic `curl.exe` fallback to ensure reliable connections across environments.
 3. **Rich Metadata Display:**
-   - **User Score & Vote Count:** Verified TMDB rating badge (e.g., ⭐ `8.4` TMDB, `12,450 votes`).
+   - **User Score & Vote Count:** Verified TMDB rating badge (e.g., ⭐ `8.4` TMDB).
    - **Backdrop Art:** Cinematic widescreen backdrops (`w1280`) integrated into movie previews.
    - **Official Trailers:** Direct one-click access to official YouTube trailers (`/videos` endpoint).
    - **Cast & Crew:** Extraction of primary cast members and directors.
@@ -130,11 +127,11 @@ IMR provides dedicated endpoints to monitor system health, database connections,
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/health` | `GET` | Verifies API health, SQLite connectivity, and Gemini LLM status. |
-| `/api/catalog/tmdb-status` | `GET` | Returns TMDB live connection status, masked API key preview, sample query results, and local poster cache coverage percentage. |
+| `/health` | `GET` | Verifies API health and SQLite database connectivity. |
+| `/api/catalog/tmdb-status` | `GET` | Returns TMDB connection status, sample query results, and local poster cache coverage. |
 | `/api/catalog/stack-queue-status` | `GET` | Real-time diagnostics of the FIFO ingestion queue and LIFO retrieval stack (item counts, recent pushes, genre breakdown). |
 | `/api/recommend` | `POST` | Core affective recommendation engine taking mood vectors, strategies, and optional filters. |
-| `/api/feedback` | `POST` | Collects 1-tap feedback (`watched`, `helped`, `skipped`, `disliked`) to refine cold-start weights. |
+| `/api/feedback` | `POST` | Collects 1-tap feedback (`watched`, `helped`, `skipped`, `disliked`) to refine recommendation weights. |
 | `/api/catalog/poster/{title_id}` | `GET` | Serves verified local theatrical one-sheet posters. |
 
 ---
@@ -145,23 +142,11 @@ The user interface adapts its luminous glass-light ambient palette based on the 
 
 | Detected Mood | Therapeutic UI Theme | Color Palette | Psychological Objective |
 |---|---|---|---|
-| **Sad / Depressed** | Gentle Solace | Sage Green (`#9CAF88`), Pale Sky (`#A8D0E6`) | Alleviates emotional fatigue; evokes freshness, safety, and breathing room. |
-| **Stressed / Anxious** | Tranquil Horizon | Dusty Lavender (`#B8A9C9`), Soft Slate (`#76A5AF`) | Lowers heart rate, reduces visual clutter, induces grounding. |
+| **Sad / Depressed** | Gentle Solace | Sage Green (`#9CAF88`), Pale Sky (`#A8D0E6`) | Alleviates emotional fatigue; evokes freshness and breathing room. |
+| **Stressed / Anxious** | Tranquil Horizon | Dusty Lavender (`#B8A9C9`), Soft Slate (`#76A5AF`) | Calming tones to lower sensory clutter and induce grounding. |
 | **Energetic / Joyful** | Warm Radiance | Sunburst Peach (`#FFAB76`), Warm Amber (`#F4C430`) | Sustains positive arousal without harsh, fatiguing saturation. |
 | **Bored / Lethargic** | Invigorating Coral | Coral Rose (`#F07167`), Mint Teal (`#00AFB9`) | Gently stimulates sensory focus and sparks curiosity. |
-| **Angry / Agitated** | Cool Balance | Forest Moss (`#4A6B53`), Deep Navy (`#1B263B`) | Neutralizes aggressive stimuli with cooling earth tones. |
-
----
-
-## Crisis Helplines & Support Safeguards
-
-If acute distress is detected in the user's reflection, recommendation generation is immediately bypassed to display confidential support resources:
-
-- **United States & Canada:** Call or text **988** ([988 Lifeline](https://988lifeline.org))
-- **Crisis Text Line:** Text **HOME to 741741** (US & Canada) or **85258** (UK)
-- **United Kingdom & Ireland:** Call **116 123** ([Samaritans](https://www.samaritans.org)) or **111** (NHS)
-- **India:** Call **14416** ([Tele-MANAS](https://telemanas.mohfw.gov.in)) or **1800-599-0019** (KIRAN)
-- **Worldwide:** Free confidential support in 130+ countries via [Find A Helpline](https://findahelpline.com) & [Befrienders Worldwide](https://www.befrienders.org)
+| **Angry / Agitated** | Cool Balance | Forest Moss (`#4A6B53`), Deep Navy (`#1B263B`) | Cooling earth tones to soothe agitated states. |
 
 ---
 
@@ -174,8 +159,8 @@ If acute distress is detected in the user's reflection, recommendation generatio
 ### Environment Setup
 Create a `.env` file in the project root or `backend/` directory:
 ```env
-# TMDB API Configuration
-TMDB_API_KEY=554ae6544a5de71241de6bb3c8d7b96a
+# TMDB API Configuration (Replace with your personal API key)
+TMDB_API_KEY=your_tmdb_api_key_here
 TMDB_IMAGE_BASE_URL=https://image.tmdb.org/t/p
 
 # Optional LLM Configuration for Rationale Generation
@@ -218,15 +203,15 @@ npm run dev
 
 ## Running Automated Tests
 
-Run the test suite verifying the pipeline functions, distress safeguard, hard filters, and ranking mathematics:
+Run the test suite verifying the pipeline functions, hard filters, and ranking mathematics:
 
 ```bash
 cd backend
 .\.venv\Scripts\pytest -v
 ```
 
-All tests verify:
-- Distress safeguard crisis phrase triggers and benign passes
+Tests verify:
+- Semantic mood parsing and preset matching
 - Hard filter runtime caps and genre exclusions
 - Affective Euclidean distance calculation and cold-start weighting
 - Health endpoint integrity and recommendation assembly
@@ -246,7 +231,6 @@ IMR-internet-movie-recommender-/
 │   │   │   └── recommend.py    # Recommendation pipeline & on-demand TMDB abstraction
 │   │   ├── core/
 │   │   │   ├── config.py       # Configuration & environment settings
-│   │   │   ├── distress.py     # Crisis safeguard engine
 │   │   │   ├── filters.py      # Runtime & genre hard exclusion filters
 │   │   │   ├── fusion.py       # Confidence-weighted modality fusion
 │   │   │   ├── llm_service.py  # Gemini LLM affective parsing & rationale
@@ -269,7 +253,7 @@ IMR-internet-movie-recommender-/
 │   │   │   ├── filters/        # FilterDrawer
 │   │   │   ├── mood/           # MoodCanvas, EmotionPresets, StrategySelector
 │   │   │   ├── results/        # MovieCard (clickable), WhyThisModal (TMDB details)
-│   │   │   └── safety/         # ConsentNotice, DistressBanner, PrivacyCenterModal
+│   │   │   └── safety/         # ConsentNotice, PrivacyCenterModal
 │   │   ├── services/api.ts     # Typed API client
 │   │   ├── types.ts            # TypeScript contracts & TMDB fields
 │   │   ├── utils/theme.ts      # Chromotherapeutic theme palette engine
