@@ -1,4 +1,4 @@
-# IMR: Internet Movie Recommender (MoodReel)
+# IMR: Internet Movie Recommender
 
 > **One Stop For All Movie Lovers**  
 > *Affective Psychology • TMDB On-Demand Ingestion • FIFO Queue & LIFO Stack Caching • Circumplex Mood Modeling • Zero Hallucinations*
