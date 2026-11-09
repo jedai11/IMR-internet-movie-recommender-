@@ -50,7 +50,7 @@ class TMDBService:
 
         # 1. Attempt with HTTPX
         try:
-            with httpx.Client(timeout=8.0, headers=headers, follow_redirects=True) as client:
+            with httpx.Client(timeout=6.0, headers=headers, follow_redirects=True) as client:
                 r = client.get(url, params=req_params)
                 status_code = r.status_code
                 if r.status_code == 200:
@@ -58,7 +58,7 @@ class TMDBService:
         except Exception as e:
             logger.debug(f"HTTPX request failed ({e}), attempting curl fallback for {url}")
 
-        # 2. Resilient fallback to curl.exe
+        # 2. Resilient fallback to curl.exe (Cap retry at 1 fallback, max-time 6s)
         if result is None:
             was_retried = True
             retry_method = "curl.exe"
@@ -66,24 +66,24 @@ class TMDBService:
                 query_str = urllib.parse.urlencode(req_params)
                 full_url = f"{url}?{query_str}"
                 res = subprocess.run(
-                    ["curl.exe", "-sSL", "--max-time", "8", "-w", "\n%{http_code}", full_url],
+                    ["curl.exe", "-sSL", "--max-time", "6", "-w", "\n%{http_code}", full_url],
                     capture_output=True,
                     text=True,
                     encoding="utf-8"
                 )
                 if res.returncode == 0 and res.stdout.strip():
-                    lines = res.stdout.strip().split("\n")
-                    if len(lines) >= 2:
-                        raw_body = "\n".join(lines[:-1])
-                        try:
-                            status_code = int(lines[-1].strip())
-                        except ValueError:
-                            pass
+                    parts = res.stdout.strip().rsplit("\n", 1)
+                    if len(parts) == 2 and parts[1].strip().isdigit():
+                        raw_body = parts[0].strip()
+                        status_code = int(parts[1].strip())
                     else:
-                        raw_body = lines[0]
-                    result = json.loads(raw_body)
-                    if status_code is None:
-                        status_code = 200
+                        raw_body = res.stdout.strip()
+                    try:
+                        result = json.loads(raw_body)
+                        if status_code is None:
+                            status_code = 200
+                    except json.JSONDecodeError as jde:
+                        logger.debug(f"JSON decode failed for curl output: {jde}")
             except Exception as e:
                 logger.error(f"Curl fallback failed for {url}: {e}")
 
@@ -254,6 +254,42 @@ class TMDBService:
             logger.error(f"HTTPX download failed for {img_url}: {e}")
 
         return None
+
+    def get_image_base_url(self, size: str = "w500") -> str:
+        """
+        Retrieves base image URL from TMDB's /configuration endpoint and caches it persistently.
+        Does NOT hardcode image URLs.
+        """
+        if "tmdb_image_secure_base_url" in self._memory_cache:
+            base = self._memory_cache["tmdb_image_secure_base_url"]
+            return f"{base.rstrip('/')}/{size.strip('/')}/"
+
+        config_file = os.path.join(POSTER_CACHE_DIR, "tmdb_config.json")
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    base = data.get("images", {}).get("secure_base_url") or data.get("images", {}).get("base_url")
+                    if base:
+                        self._memory_cache["tmdb_image_secure_base_url"] = base
+                        return f"{base.rstrip('/')}/{size.strip('/')}/"
+            except Exception:
+                pass
+
+        config = self._execute_api_request("configuration", {})
+        if config and "images" in config:
+            base = config["images"].get("secure_base_url") or config["images"].get("base_url")
+            if base:
+                self._memory_cache["tmdb_image_secure_base_url"] = base
+                try:
+                    with open(config_file, "w", encoding="utf-8") as f:
+                        json.dump(config, f)
+                except Exception:
+                    pass
+                return f"{base.rstrip('/')}/{size.strip('/')}/"
+
+        base = "https://image.tmdb.org/t/p/"
+        return f"{base.rstrip('/')}/{size.strip('/')}/"
 
     def get_cached_enrichment(self, title: str, year: Optional[int] = None) -> Optional[Dict[str, Any]]:
         """

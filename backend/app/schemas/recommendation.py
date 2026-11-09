@@ -15,40 +15,43 @@ class FilterCriteria(BaseModel):
 
 class RecommendationRequest(BaseModel):
     session_id: str
-    target_mood: MoodVector
+    target_mood: Optional[MoodVector] = None
+    mood_name: Optional[str] = None
     strategy: str = Field(default="catharsis")
     filters: Optional[FilterCriteria] = Field(default_factory=FilterCriteria)
-    limit: int = Field(default=5, ge=1, le=20)
+    limit: int = Field(default=12, ge=1, le=50)
 
 class MoodCompatibility(BaseModel):
-    title_valence: float
-    title_arousal: float
-    distance: float
-    fit_percentage: int
+    title_valence: float = 0.0
+    title_arousal: float = 0.0
+    distance: float = 0.0
+    fit_percentage: int = 100
 
 class SafetyCheckResult(BaseModel):
-    flags_evaluated: int
-    exclusions_passed: bool
+    flags_evaluated: int = 0
+    exclusions_passed: bool = True
     unknown_metadata_excluded: List[str] = []
 
 class MovieRecommendation(BaseModel):
     title_id: str
+    tmdb_id: Optional[int] = None
     title: str
-    release_year: int
-    runtime_minutes: int
-    genres: List[str]
-    origin: Optional[str] = Field(default="Hollywood", description="Origin/Cinema industry: Hollywood, Bollywood, Tollywood, Korean, etc.")
+    release_year: Optional[int] = None
+    runtime_minutes: Optional[int] = 0
+    genres: List[str] = Field(default_factory=list)
+    origin: Optional[str] = Field(default="TMDB", description="Origin/Cinema industry")
     poster_url: Optional[str] = None
+    backdrop_url: Optional[str] = None
+    tmdb_url: Optional[str] = None
     synopsis: Optional[str] = None
-    streaming_platforms: List[str]
-    score: float
-    mood_compatibility: MoodCompatibility
-    match_rationale: str
+    streaming_platforms: List[str] = Field(default_factory=list)
+    score: float = 1.0
+    mood_compatibility: Optional[MoodCompatibility] = None
+    match_rationale: Optional[str] = None
     front_page_description: Optional[str] = Field(default=None, description="Official theatrical front-page poster description verified by Gemini")
-    safety_check: SafetyCheckResult
+    safety_check: Optional[SafetyCheckResult] = None
     tmdb_rating: Optional[float] = Field(default=None, description="Official TMDB user rating out of 10")
     vote_count: Optional[int] = Field(default=None, description="TMDB vote count")
-    backdrop_url: Optional[str] = Field(default=None, description="TMDB wide backdrop poster URL")
     trailer_url: Optional[str] = Field(default=None, description="Official YouTube trailer URL")
 
 class RecommendationResponse(BaseModel):

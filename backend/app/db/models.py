@@ -123,3 +123,22 @@ class TMDBMovieStack(Base):
     pushed_at = Column(DateTime, default=utc_now)
 
     title = relationship("MovieTitle")
+
+class MoodMovieCache(Base):
+    """
+    Persistent store for TMDB movie discoveries keyed by emotional mood.
+    Stores only: TMDB movie ID, title, poster_path, backdrop_path, release_year.
+    Zero per-request movie enrichment calls needed.
+    """
+    __tablename__ = "mood_movie_cache"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    mood_key = Column(String, index=True, nullable=False)
+    tmdb_id = Column(Integer, index=True, nullable=False)
+    title = Column(String, nullable=False)
+    poster_path = Column(String, nullable=True)
+    backdrop_path = Column(String, nullable=True)
+    release_year = Column(Integer, nullable=True)
+    order_index = Column(Integer, default=0)
+    cached_at = Column(DateTime, default=utc_now, nullable=False)
+    expires_at = Column(DateTime, nullable=False, index=True)

@@ -1,0 +1,202 @@
+"""
+MOOD CACHE SERVICE
+
+Provides persistent, single-fetch caching of TMDB discover results keyed by mood.
+- Checks local SQLite database first (0 TMDB calls on cache hit).
+- Uses concurrency locks so simultaneous uncached requests for the same mood do not duplicate TMDB calls.
+- Configurable 7-day expiry and fallback to stale stored cache if TMDB fails or times out.
+- Stores only: tmdb_id, title, poster_path, backdrop_path, release_year.
+- Eliminates per-movie enrichment (details, credits, videos) entirely.
+"""
+
+import logging
+import threading
+from datetime import datetime, timedelta, timezone
+from collections import defaultdict
+from typing import List, Dict, Any, Optional
+from sqlalchemy.orm import Session
+
+from app.db.models import MoodMovieCache, utc_now
+from app.core.tmdb_service import tmdb_service
+from app.core.mood_tmdb_mapping import (
+    DEFAULT_CACHE_EXPIRY_DAYS,
+    MOOD_TMDB_MAPPING,
+    resolve_mood_key,
+    get_tmdb_query_params
+)
+
+logger = logging.getLogger(__name__)
+
+# Concurrency locking: prevents duplicate TMDB calls for the same mood
+_mood_locks: Dict[str, threading.Lock] = defaultdict(threading.Lock)
+_meta_lock = threading.Lock()
+
+def get_mood_lock(mood_key: str) -> threading.Lock:
+    with _meta_lock:
+        return _mood_locks[mood_key]
+
+
+class MoodCacheService:
+    def __init__(self, expiry_days: int = DEFAULT_CACHE_EXPIRY_DAYS):
+        self.expiry_days = expiry_days
+
+    def get_stored_mood_movies(
+        self,
+        mood_key: str,
+        db: Session,
+        include_expired: bool = False
+    ) -> List[MoodMovieCache]:
+        """
+        Retrieves cached movies for a mood directly from SQLite.
+        If include_expired is False, filters by expires_at > utc_now().
+        """
+        query = db.query(MoodMovieCache).filter(MoodMovieCache.mood_key == mood_key)
+        if not include_expired:
+            now = datetime.now(timezone.utc)
+            query = query.filter(MoodMovieCache.expires_at > now)
+        return query.order_by(MoodMovieCache.order_index.asc()).all()
+
+    def fetch_and_store_from_tmdb(
+        self,
+        mood_key: str,
+        db: Session,
+        page: int = 1
+    ) -> List[MoodMovieCache]:
+        """
+        Calls TMDB /discover/movie endpoint once for this mood, saves the results to the database,
+        and returns the persisted MoodMovieCache objects.
+        No details, credits, or video endpoints are called.
+        """
+        params = get_tmdb_query_params(mood_key, page=page)
+        logger.info(f"[MoodCache] Fetching uncached discover results from TMDB for mood '{mood_key}' (page {page})...")
+        
+        discover_data = tmdb_service._execute_api_request("discover/movie", params)
+        if not discover_data or not discover_data.get("results"):
+            logger.warning(f"[MoodCache] TMDB discover returned no results for mood '{mood_key}'.")
+            return []
+
+        raw_results = discover_data["results"]
+        now = datetime.now(timezone.utc)
+        expires_at = now + timedelta(days=self.expiry_days)
+
+        # Clear existing cached entries for this mood
+        db.query(MoodMovieCache).filter(MoodMovieCache.mood_key == mood_key).delete()
+
+        new_entries: List[MoodMovieCache] = []
+        for idx, item in enumerate(raw_results):
+            tmdb_id = item.get("id")
+            title = item.get("title")
+            if not tmdb_id or not title:
+                continue
+
+            release_date = item.get("release_date") or ""
+            year = int(release_date[:4]) if len(release_date) >= 4 and release_date[:4].isdigit() else None
+
+            cache_record = MoodMovieCache(
+                mood_key=mood_key,
+                tmdb_id=tmdb_id,
+                title=title,
+                poster_path=item.get("poster_path"),
+                backdrop_path=item.get("backdrop_path"),
+                release_year=year,
+                order_index=idx,
+                cached_at=now,
+                expires_at=expires_at
+            )
+            db.add(cache_record)
+            new_entries.append(cache_record)
+
+        db.commit()
+        for e in new_entries:
+            db.refresh(e)
+
+        logger.info(f"[MoodCache] Successfully stored {len(new_entries)} movies for mood '{mood_key}' (Expires: {expires_at.date()}).")
+        return new_entries
+
+    def get_mood_recommendations(
+        self,
+        mood_key: str,
+        db: Session,
+        force_refresh: bool = False,
+        limit: int = 12
+    ) -> List[Dict[str, Any]]:
+        """
+        Primary Discovery Accessor:
+        1. Checks database for mood's stored results.
+        2. If found and not expired, returns immediately (0 TMDB calls).
+        3. If missing/expired, acquires lock to prevent duplicate fetch.
+        4. Re-checks DB inside lock (double-checked locking).
+        5. Calls TMDB discover once, saves to DB, and returns results.
+        6. If TMDB fails, falls back to stale stored results if any exist.
+        """
+        clean_key = mood_key.strip().lower()
+
+        # Step 1: Check database (Cache Hit path - 0 TMDB calls)
+        if not force_refresh:
+            cached = self.get_stored_mood_movies(clean_key, db, include_expired=False)
+            if cached:
+                logger.info(f"[MoodCache HIT] Serving {len(cached)} movies for mood '{clean_key}' directly from DB (0 TMDB calls).")
+                return self._format_results(cached[:limit])
+
+        # Step 2: Missing or Expired - Acquire Lock
+        lock = get_mood_lock(clean_key)
+        with lock:
+            # Double-check inside lock: another thread might have just fetched it
+            if not force_refresh:
+                cached = self.get_stored_mood_movies(clean_key, db, include_expired=False)
+                if cached:
+                    logger.info(f"[MoodCache HIT (post-lock)] Serving {len(cached)} movies for mood '{clean_key}' (0 TMDB calls).")
+                    return self._format_results(cached[:limit])
+
+            # Step 3: Fetch from TMDB discover endpoint
+            try:
+                new_records = self.fetch_and_store_from_tmdb(clean_key, db, page=1)
+                if new_records:
+                    return self._format_results(new_records[:limit])
+            except Exception as e:
+                logger.error(f"[MoodCache] TMDB discover fetch failed for '{clean_key}': {e}")
+
+            # Step 4: Fallback to stale stored results if TMDB fails or is unavailable
+            stale_cached = self.get_stored_mood_movies(clean_key, db, include_expired=True)
+            if stale_cached:
+                logger.warning(f"[MoodCache FALLBACK] TMDB failed; serving {len(stale_cached)} stale stored movies for '{clean_key}'.")
+                return self._format_results(stale_cached[:limit])
+
+            return []
+
+    def refresh_mood(self, mood_key: str, db: Session) -> List[Dict[str, Any]]:
+        """
+        Manual 'refresh mood' command: bypasses cache and re-fetches from TMDB discover.
+        """
+        clean_key = mood_key.strip().lower()
+        return self.get_mood_recommendations(clean_key, db, force_refresh=True)
+
+    def _format_results(self, records: List[MoodMovieCache]) -> List[Dict[str, Any]]:
+        """
+        Formats stored DB records into response objects with dynamic TMDB image URLs.
+        Image base URL is retrieved from TMDB's /configuration endpoint and cached.
+        """
+        poster_base = tmdb_service.get_image_base_url(size="w500")
+        backdrop_base = tmdb_service.get_image_base_url(size="w780")
+
+        results = []
+        for r in records:
+            poster_url = f"{poster_base}{r.poster_path.lstrip('/')}" if r.poster_path else None
+            backdrop_url = f"{backdrop_base}{r.backdrop_path.lstrip('/')}" if r.backdrop_path else None
+
+            results.append({
+                "tmdb_id": r.tmdb_id,
+                "title_id": f"tmdb_{r.tmdb_id}",
+                "title": r.title,
+                "release_year": r.release_year,
+                "poster_path": r.poster_path,
+                "poster_url": poster_url,
+                "backdrop_path": r.backdrop_path,
+                "backdrop_url": backdrop_url,
+                "tmdb_url": f"https://www.themoviedb.org/movie/{r.tmdb_id}"
+            })
+        return results
+
+
+mood_cache_service = MoodCacheService()
+
