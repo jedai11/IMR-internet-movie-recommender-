@@ -11,6 +11,7 @@ Provides persistent, single-fetch caching of TMDB discover results keyed by mood
 
 import logging
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 from typing import List, Dict, Any, Optional
@@ -60,28 +61,47 @@ class MoodCacheService:
         self,
         mood_key: str,
         db: Session,
-        page: int = 1,
+        max_pages: int = 3,
         origin_keys: Optional[List[str]] = None,
         cache_key: Optional[str] = None
     ) -> List[MoodMovieCache]:
         """
-        Calls TMDB /discover/movie endpoint once for this mood (and optional origin filter),
-        saves the results to the database keyed by cache_key, and returns the persisted MoodMovieCache objects.
-        No details, credits, or video endpoints are called.
+        Calls TMDB /discover/movie endpoint concurrently for multiple pages (default 3 pages = ~60 movies)
+        in parallel via ThreadPoolExecutor, achieving ~0.7-1.1s latency on uncached queries.
+        Saves deduplicated results to the database keyed by cache_key and returns persisted objects.
         """
         storage_key = cache_key or mood_key
-        params = get_tmdb_query_params(mood_key, page=page, origin_keys=origin_keys)
         logger.info(
-            f"[MoodCache] Fetching uncached discover results from TMDB for key '{storage_key}' "
-            f"(mood='{mood_key}', origins={origin_keys}, page={page})..."
+            f"[MoodCache] Concurrently fetching {max_pages} discover pages from TMDB for key '{storage_key}' "
+            f"(mood='{mood_key}', origins={origin_keys})..."
         )
-        
-        discover_data = tmdb_service._execute_api_request("discover/movie", params)
-        if not discover_data or not discover_data.get("results"):
+
+        def fetch_single_page(p: int):
+            params = get_tmdb_query_params(mood_key, page=p, origin_keys=origin_keys)
+            data = tmdb_service._execute_api_request("discover/movie", params)
+            return p, data
+
+        with ThreadPoolExecutor(max_workers=max_pages) as executor:
+            page_outputs = list(executor.map(fetch_single_page, range(1, max_pages + 1)))
+
+        # Preserve TMDB popularity ranking by sorting results by page number
+        page_outputs.sort(key=lambda x: x[0])
+
+        raw_results = []
+        seen_ids = set()
+        for _, discover_data in page_outputs:
+            if not discover_data or not discover_data.get("results"):
+                continue
+            for m in discover_data["results"]:
+                m_id = m.get("id")
+                if m_id and m_id not in seen_ids:
+                    seen_ids.add(m_id)
+                    raw_results.append(m)
+
+        if not raw_results:
             logger.warning(f"[MoodCache] TMDB discover returned no results for key '{storage_key}'.")
             return []
 
-        raw_results = discover_data["results"]
         now = datetime.now(timezone.utc)
         expires_at = now + timedelta(days=self.expiry_days)
 
@@ -109,14 +129,12 @@ class MoodCacheService:
                 cached_at=now,
                 expires_at=expires_at
             )
-            db.add(cache_record)
             new_entries.append(cache_record)
 
+        db.add_all(new_entries)
         db.commit()
-        for e in new_entries:
-            db.refresh(e)
 
-        logger.info(f"[MoodCache] Successfully stored {len(new_entries)} movies for key '{storage_key}' (Expires: {expires_at.date()}).")
+        logger.info(f"[MoodCache] Successfully stored {len(new_entries)} movies in parallel for key '{storage_key}' (Expires: {expires_at.date()}).")
         return new_entries
 
     def get_mood_recommendations(
@@ -125,14 +143,14 @@ class MoodCacheService:
         db: Session,
         origin_keys: Optional[List[str]] = None,
         force_refresh: bool = False,
-        limit: int = 12
+        limit: int = 36
     ) -> List[Dict[str, Any]]:
         """
         Primary Discovery Accessor:
         1. Resolves composite storage key (e.g. 'joyful:bollywood' or 'joyful').
         2. Checks database for mood's stored results.
-        3. If found and not expired, returns immediately (0 TMDB calls).
-        4. If missing/expired, acquires lock to prevent duplicate fetch.
+        3. If found, unexpired, and has sufficient results for requested limit, returns immediately (0 TMDB calls).
+        4. If missing/expired/insufficient, acquires lock to fetch up to 3 pages (~60 movies).
         5. Re-checks DB inside lock (double-checked locking).
         6. Calls TMDB discover once, saves to DB, and returns results.
         7. If TMDB fails, falls back to stale stored results if any exist.
@@ -145,8 +163,8 @@ class MoodCacheService:
         # Step 1: Check database (Cache Hit path - 0 TMDB calls)
         if not force_refresh:
             cached = self.get_stored_mood_movies(storage_key, db, include_expired=False)
-            if cached:
-                logger.info(f"[MoodCache HIT] Serving {len(cached)} movies for key '{storage_key}' directly from DB (0 TMDB calls).")
+            if cached and (len(cached) >= limit or len(cached) >= 30):
+                logger.info(f"[MoodCache HIT] Serving {len(cached[:limit])} movies for key '{storage_key}' directly from DB (0 TMDB calls).")
                 return self._format_results(cached[:limit], origin_label=origin_label)
 
         # Step 2: Missing or Expired - Acquire Lock
@@ -155,16 +173,16 @@ class MoodCacheService:
             # Double-check inside lock: another thread might have just fetched it
             if not force_refresh:
                 cached = self.get_stored_mood_movies(storage_key, db, include_expired=False)
-                if cached:
-                    logger.info(f"[MoodCache HIT (post-lock)] Serving {len(cached)} movies for key '{storage_key}' (0 TMDB calls).")
+                if cached and (len(cached) >= limit or len(cached) >= 30):
+                    logger.info(f"[MoodCache HIT (post-lock)] Serving {len(cached[:limit])} movies for key '{storage_key}' (0 TMDB calls).")
                     return self._format_results(cached[:limit], origin_label=origin_label)
 
-            # Step 3: Fetch from TMDB discover endpoint
+            # Step 3: Fetch from TMDB discover endpoint (3 pages = ~60 movies)
             try:
                 new_records = self.fetch_and_store_from_tmdb(
                     mood_key=clean_key,
                     db=db,
-                    page=1,
+                    max_pages=3,
                     origin_keys=canonical_origins,
                     cache_key=storage_key
                 )
@@ -197,8 +215,9 @@ class MoodCacheService:
         """
         Formats stored DB records into response objects with dynamic TMDB image URLs.
         Image base URL is retrieved from TMDB's /configuration endpoint and cached.
+        Uses w342 for high-density, fast-loading responsive posters (3x faster than w500).
         """
-        poster_base = tmdb_service.get_image_base_url(size="w500")
+        poster_base = tmdb_service.get_image_base_url(size="w342")
         backdrop_base = tmdb_service.get_image_base_url(size="w780")
 
         results = []

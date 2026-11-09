@@ -63,7 +63,7 @@ def get_recommendations(
     origin_keys = resolve_origin_keys(origins=raw_origins, text=origin_text)
     origin_display = ", ".join([k.capitalize() for k in origin_keys]) if origin_keys else "TMDB"
 
-    limit = request.limit or 12
+    limit = request.limit or 36
 
     # 2. Fetch recommendations from Mood Cache Service
     cached_movies = mood_cache_service.get_mood_recommendations(

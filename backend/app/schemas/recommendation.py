@@ -19,7 +19,7 @@ class RecommendationRequest(BaseModel):
     mood_name: Optional[str] = None
     strategy: str = Field(default="catharsis")
     filters: Optional[FilterCriteria] = Field(default_factory=FilterCriteria)
-    limit: int = Field(default=12, ge=1, le=50)
+    limit: int = Field(default=36, ge=1, le=100)
 
 class MoodCompatibility(BaseModel):
     title_valence: float = 0.0

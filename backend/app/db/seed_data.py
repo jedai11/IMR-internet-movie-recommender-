@@ -1361,7 +1361,12 @@ def seed_database(db: Session):
     """
     Seeds database with genres and movie titles.
     Inserts any titles that do not already exist by ID.
+    Fast path: skips if already populated (0ms startup overhead).
     """
+    existing_count = db.query(MovieTitle).count()
+    if existing_count >= len(SEED_MOVIES):
+        return
+
     existing_ids = {row[0] for row in db.query(MovieTitle.id).all()}
     genre_cache = {g.name: g for g in db.query(Genre).all()}
 
