@@ -34,7 +34,7 @@ export async function getRecommendations(
   targetMood: MoodVector,
   strategy: string,
   filters: FilterCriteria,
-  limit: number = 12,
+  limit: number = 36,
   moodName?: string
 ): Promise<RecommendationResponse> {
   const resp = await fetch(`${API_BASE}/recommend`, {

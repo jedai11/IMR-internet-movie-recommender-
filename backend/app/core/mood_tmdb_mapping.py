@@ -12,7 +12,8 @@ TMDB Genre ID Reference:
   Thriller: 53      | War: 10752         | Western: 37
 """
 
-from typing import Dict, Any, Optional
+import re
+from typing import Dict, Any, Optional, List
 
 # Configurable cache expiry (default 7 days)
 DEFAULT_CACHE_EXPIRY_DAYS = 7
@@ -20,6 +21,53 @@ DEFAULT_CACHE_EXPIRY_DAYS = 7
 # TMDB HTTP Request Constraints
 TMDB_TIMEOUT_SECONDS = 6.0
 TMDB_MAX_RETRIES = 2
+
+# Origin / Cinema Industry to TMDB ISO Language Code Mapping
+ORIGIN_LANGUAGE_MAP: Dict[str, str] = {
+    "bollywood": "hi",
+    "tollywood": "te|ta|ml|kn",
+    "korean": "ko",
+    "japanese": "ja",
+    "hollywood": "en",
+    "asian": "hi|te|ta|ml|kn|ko|ja|zh|th"
+}
+
+ORIGIN_SYNONYMS: Dict[str, str] = {
+    # Bollywood / Hindi
+    "bollywood": "bollywood",
+    "bolly": "bollywood",
+    "hindi": "bollywood",
+    "indian": "bollywood",
+    "india": "bollywood",
+    # Tollywood / South Indian
+    "tollywood": "tollywood",
+    "tolly": "tollywood",
+    "telugu": "tollywood",
+    "tamil": "tollywood",
+    "malayalam": "tollywood",
+    "kannada": "tollywood",
+    "south indian": "tollywood",
+    "south": "tollywood",
+    # Korean
+    "korean": "korean",
+    "korea": "korean",
+    "kdrama": "korean",
+    "k-drama": "korean",
+    # Japanese
+    "japanese": "japanese",
+    "japan": "japanese",
+    "anime": "japanese",
+    # Hollywood / English
+    "hollywood": "hollywood",
+    "american": "hollywood",
+    "english": "hollywood",
+    "us": "hollywood",
+    # Asian / International
+    "asian": "asian",
+    "asia": "asian",
+    "chinese": "asian",
+    "china": "asian"
+}
 
 # Mood -> TMDB Query Parameter Mapping
 # Edit the parameters below to tune movie discovery per mood:
@@ -178,9 +226,53 @@ def resolve_mood_key(
 
     return "default"
 
-def get_tmdb_query_params(mood_key: str, page: int = 1) -> Dict[str, Any]:
+def resolve_origin_keys(origins: Optional[List[str]] = None, text: Optional[str] = None) -> List[str]:
     """
-    Returns query parameters for TMDB's /discover/movie endpoint based on the mood key.
+    Normalizes requested origin codes from filters or free-text into canonical origin keys.
+    Returns list of canonical origin keys (e.g. ['bollywood'] or ['korean']).
+    If empty or 'all', returns empty list (all world cinema).
+    """
+    canonical_origins = set()
+    if origins:
+        for o in origins:
+            clean = o.strip().lower()
+            if clean == "all":
+                return []
+            if clean in ORIGIN_LANGUAGE_MAP:
+                canonical_origins.add(clean)
+            elif clean in ORIGIN_SYNONYMS:
+                canonical_origins.add(ORIGIN_SYNONYMS[clean])
+
+    # Also detect origin keywords from query text if origins list was not explicitly set
+    if not canonical_origins and text:
+        lower = text.lower()
+        for token, canon in ORIGIN_SYNONYMS.items():
+            pattern = r"\b" + re.escape(token) + r"\b"
+            if re.search(pattern, lower):
+                canonical_origins.add(canon)
+
+    return sorted(list(canonical_origins))
+
+def get_origin_language_param(origin_keys: List[str]) -> Optional[str]:
+    """
+    Combines ISO 639-1 language codes for TMDB's with_original_language parameter
+    using TMDB's pipe-OR syntax.
+    """
+    langs = []
+    for ok in origin_keys:
+        lang_code = ORIGIN_LANGUAGE_MAP.get(ok)
+        if lang_code:
+            langs.append(lang_code)
+    return "|".join(langs) if langs else None
+
+def get_tmdb_query_params(
+    mood_key: str,
+    page: int = 1,
+    origin_keys: Optional[List[str]] = None
+) -> Dict[str, Any]:
+    """
+    Returns query parameters for TMDB's /discover/movie endpoint based on the mood key
+    and optional cinema origin keys (e.g. ['bollywood'], ['korean']).
     """
     config = MOOD_TMDB_MAPPING.get(mood_key, MOOD_TMDB_MAPPING["default"])
     params: Dict[str, Any] = {
@@ -199,6 +291,21 @@ def get_tmdb_query_params(mood_key: str, page: int = 1) -> Dict[str, Any]:
         params["vote_count.gte"] = config["vote_count_gte"]
     if config.get("vote_average_gte"):
         params["vote_average.gte"] = config["vote_average_gte"]
+
+    # Apply origin / cinema language constraints if requested
+    if origin_keys:
+        lang_param = get_origin_language_param(origin_keys)
+        if lang_param:
+            params["with_original_language"] = lang_param
+            # For non-Hollywood origins, TMDB global vote counts are naturally lower.
+            # Relax vote_count threshold so international cinema isn't filtered out.
+            has_non_hollywood = any(ok != "hollywood" for ok in origin_keys)
+            if has_non_hollywood:
+                params["vote_count.gte"] = 10
+                # Stressed mood excludes crime (80), which eliminates many Hindi family dramas;
+                # relax to only exclude horror and thriller
+                if mood_key == "stressed":
+                    params["without_genres"] = "27,53"
 
     return params
 
