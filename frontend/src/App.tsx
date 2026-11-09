@@ -318,10 +318,29 @@ export function App() {
       };
       setActiveTargetMood(target);
 
-      // Merge semantically requested genres into preferred filters
+      // Merge semantically requested genres and detected origins into filters
+      const detectedOrigins = [...(filters.origins || [])];
+      if (detectedOrigins.length === 0 && query) {
+        const qLower = query.toLowerCase();
+        if (/\b(bollywood|hindi|indian)\b/i.test(qLower)) {
+          detectedOrigins.push('bollywood');
+        } else if (/\b(tollywood|telugu|tamil|malayalam|kannada|south indian)\b/i.test(qLower)) {
+          detectedOrigins.push('tollywood');
+        } else if (/\b(korean|k-drama|kdrama|korea)\b/i.test(qLower)) {
+          detectedOrigins.push('korean');
+        } else if (/\b(japanese|anime|japan)\b/i.test(qLower)) {
+          detectedOrigins.push('japanese');
+        } else if (/\b(hollywood|american|english)\b/i.test(qLower)) {
+          detectedOrigins.push('hollywood');
+        } else if (/\b(asian|asia|chinese)\b/i.test(qLower)) {
+          detectedOrigins.push('asian');
+        }
+      }
+
       const updatedFilters: FilterCriteria = {
         ...filters,
-        preferred_genres: Array.from(new Set([...(filters.preferred_genres || []), ...semGenres]))
+        preferred_genres: Array.from(new Set([...(filters.preferred_genres || []), ...semGenres])),
+        origins: detectedOrigins
       };
 
       // 2. Query grounded recommendation engine
@@ -616,11 +635,16 @@ export function App() {
                   className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'filters'
                       ? 'bg-indigo-600 text-white border border-indigo-500 shadow-md shadow-indigo-600/30'
+                      : filters.origins && filters.origins.length > 0
+                      ? 'glass-light-pill border-cyan-400 text-cyan-300'
                       : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC]'
                   }`}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
                   <span>Filters</span>
+                  {filters.origins && filters.origins.length > 0 && (
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  )}
                 </button>
               </div>
             </div>
@@ -784,6 +808,11 @@ export function App() {
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
+                  {filters.origins && filters.origins.length > 0 && (
+                    <span className="glass-light-pill text-xs font-bold text-amber-300 px-3 py-1 rounded-xl border-amber-500/40 bg-amber-950/30">
+                      Origin: {filters.origins.map(o => o.charAt(0).toUpperCase() + o.slice(1)).join(', ')}
+                    </span>
+                  )}
                   {detectedGenres.length > 0 && (
                     <span className="glass-light-pill text-xs font-bold text-cyan-300 px-3 py-1 rounded-xl border-cyan-500/40 bg-cyan-950/30">
                       Filtered: {detectedGenres.join(', ')}

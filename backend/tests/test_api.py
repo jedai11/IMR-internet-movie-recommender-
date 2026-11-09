@@ -71,6 +71,25 @@ def test_recommendation_pipeline_end_to_end(client):
         assert rec["match_rationale"] is not None
         assert rec["mood_compatibility"]["fit_percentage"] > 0
 
+def test_recommendation_with_bollywood_origin_filter(client):
+    payload = {
+        "session_id": "test_session_bolly",
+        "mood_name": "joyful",
+        "filters": {
+            "origins": ["bollywood"]
+        },
+        "limit": 5
+    }
+    response = client.post("/api/recommend", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["recommendations"]) > 0
+    assert "origin_keys" in data["meta"]
+    assert "bollywood" in data["meta"]["origin_keys"]
+    for rec in data["recommendations"]:
+        assert rec["origin"] == "Bollywood"
+        assert rec["tmdb_id"] is not None
+
 def test_feedback_submission(client):
     payload = {
         "session_id": "test_session_123",

@@ -1,7 +1,8 @@
 import time
 import json
 import logging
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 
@@ -18,6 +19,7 @@ from app.core.mood_cache_service import mood_cache_service
 from app.core.mood_tmdb_mapping import (
     MOOD_TMDB_MAPPING,
     resolve_mood_key,
+    resolve_origin_keys,
     DEFAULT_CACHE_EXPIRY_DAYS
 )
 
@@ -43,7 +45,7 @@ def get_recommendations(
     """
     start_time = time.perf_counter()
 
-    # 1. Resolve canonical mood key
+    # 1. Resolve canonical mood key and origin filters
     pref_genre = request.filters.preferred_genres[0] if request.filters and request.filters.preferred_genres else None
     v = request.target_mood.valence if request.target_mood else None
     a = request.target_mood.arousal if request.target_mood else None
@@ -55,12 +57,19 @@ def get_recommendations(
         arousal=a
     )
 
+    # Resolve origin filters from filter criteria or query text
+    raw_origins = request.filters.origins if request.filters else None
+    origin_text = f"{request.mood_name or ''} {pref_genre or ''}".strip()
+    origin_keys = resolve_origin_keys(origins=raw_origins, text=origin_text)
+    origin_display = ", ".join([k.capitalize() for k in origin_keys]) if origin_keys else "TMDB"
+
     limit = request.limit or 12
 
     # 2. Fetch recommendations from Mood Cache Service
     cached_movies = mood_cache_service.get_mood_recommendations(
         mood_key=mood_key,
         db=db,
+        origin_keys=origin_keys,
         force_refresh=False,
         limit=limit
     )
@@ -76,12 +85,12 @@ def get_recommendations(
                 release_year=item.get("release_year") or 2024,
                 runtime_minutes=110,
                 genres=[mood_key.capitalize()],
-                origin="TMDB",
+                origin=item.get("origin") or origin_display,
                 poster_url=item.get("poster_url"),
                 backdrop_url=item.get("backdrop_url"),
                 tmdb_url=item.get("tmdb_url"),
                 score=round(1.0 - (idx * 0.02), 2),
-                match_rationale=f"Discovered for your {mood_key} mood from TMDB.",
+                match_rationale=f"Discovered for your {mood_key} mood from TMDB ({item.get('origin') or origin_display}).",
                 mood_compatibility=MoodCompatibility(
                     title_valence=v if v is not None else 0.0,
                     title_arousal=a if a is not None else 0.0,
@@ -103,6 +112,10 @@ def get_recommendations(
         local_query = db.query(MovieTitle)
         if max_runtime:
             local_query = local_query.filter(MovieTitle.runtime_minutes <= max_runtime)
+        if origin_keys:
+            local_query = local_query.filter(
+                or_(*[MovieTitle.origin.ilike(f"%{ok}%") for ok in origin_keys])
+            )
         local_titles = local_query.all()
         for m in local_titles:
             g_names = [g.name for g in m.genres]
@@ -119,7 +132,7 @@ def get_recommendations(
                 poster_url=m.poster_url or f"/api/catalog/poster/{m.id}",
                 tmdb_url=None,
                 score=0.9,
-                match_rationale=f"Catalog fallback for {mood_key} mood.",
+                match_rationale=f"Catalog fallback for {mood_key} mood ({getattr(m, 'origin', 'Hollywood')}).",
                 mood_compatibility=MoodCompatibility(
                     title_valence=m.valence_score,
                     title_arousal=m.arousal_score,
@@ -156,6 +169,7 @@ def get_recommendations(
         recommendations=top_recommendations,
         meta={
             "mood_key": mood_key,
+            "origin_keys": origin_keys,
             "total_returned": len(top_recommendations),
             "cached_storage": True,
             "latency_ms": latency_ms
@@ -164,15 +178,21 @@ def get_recommendations(
 
 
 @router.post("/refresh-mood/{mood_key}")
-def manual_refresh_mood(mood_key: str, db: Session = Depends(get_db)):
+def manual_refresh_mood(
+    mood_key: str,
+    origin: Optional[str] = Query(default=None, description="Optional origin filter, e.g. 'bollywood', 'korean'"),
+    db: Session = Depends(get_db)
+):
     """
-    Manual 'refresh mood' command: forces fresh TMDB discover fetch for this mood,
+    Manual 'refresh mood' command: forces fresh TMDB discover fetch for this mood and optional origin,
     updates the persistent SQLite storage, and resets the 7-day expiry.
     """
-    refreshed = mood_cache_service.refresh_mood(mood_key=mood_key, db=db)
+    origin_keys = resolve_origin_keys(origins=[origin] if origin else None)
+    refreshed = mood_cache_service.refresh_mood(mood_key=mood_key, db=db, origin_keys=origin_keys)
     return {
         "status": "refreshed",
         "mood_key": mood_key,
+        "origin_keys": origin_keys,
         "count": len(refreshed),
         "expiry_days": DEFAULT_CACHE_EXPIRY_DAYS,
         "movies": refreshed

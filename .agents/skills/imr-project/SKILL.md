@@ -140,7 +140,7 @@ npm --prefix frontend run dev
 > Run BOTH of these after every backend change, and the build check after every frontend change. Never push with failing tests.
 
 ```powershell
-# Backend tests (must be 17/17 passing)
+# Backend tests (must be 18/18 passing)
 .\backend\.venv\Scripts\pytest backend\tests -v
 
 # Frontend TypeScript build (must be 0 errors)
@@ -324,3 +324,4 @@ The `backend/app/core/config.py` reads these via Pydantic `BaseSettings`.
 - ❌ Do NOT change unrelated features when fixing a bug
 - ❌ Do NOT skip pytest before pushing
 - ❌ Do NOT use comma-AND for TMDB `with_genres` (use `|` pipe-OR)
+
