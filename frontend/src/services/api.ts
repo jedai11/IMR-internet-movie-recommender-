@@ -34,7 +34,8 @@ export async function getRecommendations(
   targetMood: MoodVector,
   strategy: string,
   filters: FilterCriteria,
-  limit: number = 5
+  limit: number = 12,
+  moodName?: string
 ): Promise<RecommendationResponse> {
   const resp = await fetch(`${API_BASE}/recommend`, {
     method: 'POST',
@@ -42,6 +43,7 @@ export async function getRecommendations(
     body: JSON.stringify({
       session_id: sessionId,
       target_mood: targetMood,
+      mood_name: moodName,
       strategy,
       filters,
       limit

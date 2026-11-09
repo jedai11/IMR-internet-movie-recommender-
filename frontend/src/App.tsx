@@ -325,12 +325,14 @@ export function App() {
       };
 
       // 2. Query grounded recommendation engine
+      const moodQueryParam = query || (analysis.inferred_tags && analysis.inferred_tags[0]) || undefined;
       const recsResponse = await getRecommendations(
         sessionId,
         target,
         strategy,
         updatedFilters,
-        6
+        12,
+        moodQueryParam
       );
 
       setRecommendations(recsResponse.recommendations);
@@ -810,6 +812,26 @@ export function App() {
           )}
         </section>
       </main>
+
+      {/* TMDB Required Attribution Footer */}
+      <footer className="w-full max-w-6xl mx-auto px-4 py-8 mt-12 border-t border-[#1C2540] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#94A3B8]/80 relative z-10">
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-[#CBD5E1]">IMR</span>
+          <span className="text-[#475569]">•</span>
+          <span>Internet Movie Recommender</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <img
+            src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg"
+            alt="The Movie Database (TMDB)"
+            className="h-3.5 opacity-60 hover:opacity-90 transition-opacity"
+            loading="lazy"
+          />
+          <span className="text-[11px] text-[#94A3B8]/80 text-center sm:text-right">
+            This product uses the TMDB API but is not endorsed or certified by TMDB.
+          </span>
+        </div>
+      </footer>
 
       {/* Modals */}
       {inspectMovie && activeTargetMood && (

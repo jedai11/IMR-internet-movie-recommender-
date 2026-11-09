@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.db.session import engine, Base, SessionLocal
+from app.db import models
 from app.db.seed_data import seed_database
 from app.api.api_router import api_router
 

@@ -69,22 +69,24 @@ export interface SafetyCheckResult {
 
 export interface MovieRecommendation {
   title_id: string;
+  tmdb_id?: number;
   title: string;
-  release_year: number;
-  runtime_minutes: number;
-  genres: string[];
+  release_year?: number;
+  runtime_minutes?: number;
+  genres?: string[];
   origin?: string;
   poster_url?: string;
+  backdrop_url?: string;
+  tmdb_url?: string;
   synopsis?: string;
-  streaming_platforms: string[];
-  score: number;
+  streaming_platforms?: string[];
+  score?: number;
   mood_compatibility: MoodCompatibility;
-  match_rationale: string;
+  match_rationale?: string;
   front_page_description?: string;
   safety_check: SafetyCheckResult;
   tmdb_rating?: number;
   vote_count?: number;
-  backdrop_url?: string;
   trailer_url?: string;
 }
 
