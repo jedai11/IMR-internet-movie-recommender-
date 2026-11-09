@@ -150,7 +150,13 @@ The user interface adapts its luminous glass-light ambient palette based on the 
 
 ---
 
-## Quickstart Guide
+## Deployment & Live App
+
+> **Live App:** *Link will be updated upon Vercel deployment.*
+
+---
+
+## Local Development & Setup
 
 ### Prerequisites
 - Python 3.10+
@@ -168,36 +174,26 @@ GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-3.5-flash
 ```
 
-### One-Click Launch (Windows)
-Run the included launcher script:
-```bat
-start_app.bat
-```
-Starts the backend on `http://127.0.0.1:8000` and the frontend on `http://localhost:5173`.
+### Running Locally
 
-### Or Run via npm
+You can launch both frontend and backend together:
 ```bash
 npm run dev
 ```
-Launches both frontend and backend concurrently.
 
-### Manual Launch
+Or run each service individually:
 
-#### 1. Backend (FastAPI)
+**Backend:**
 ```bash
 cd backend
-.\.venv\Scripts\Activate.ps1
 python run_backend.py
 ```
-- API Endpoint: **http://127.0.0.1:8000**
-- Interactive Docs (Swagger): **http://127.0.0.1:8000/docs**
 
-#### 2. Frontend (React + Vite + Tailwind)
+**Frontend:**
 ```bash
 cd frontend
 npm run dev
 ```
-- Web Application: **http://localhost:5173**
 
 ---
 
@@ -264,7 +260,7 @@ IMR-internet-movie-recommender-/
 ├── docs/                       # Architecture, config reference, privacy principles
 ├── LICENSE                     # MIT Open Source License
 ├── package.json                # Root package with concurrent dev scripts
-└── start_app.bat               # Safe local launcher (127.0.0.1)
+└── start_app.bat               # Local development launcher script
 ```
 
 ---
