@@ -36,15 +36,17 @@ export const MovieCard: React.FC<Props> = ({ movie }) => {
         {/* Subtle Ambient Vignette */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#080B16] via-transparent to-transparent pointer-events-none" />
 
-        {/* 18+ or Uncensored Badges */}
-        {(movie.is_adult || movie.certification === '18+') && (
-          <div className="absolute top-3 left-3 text-[10px] font-black text-rose-200 bg-rose-950/85 backdrop-blur-md px-2 py-0.5 rounded-lg border border-rose-500/50 shadow-md">
-            🔞 18+
+        {/* 18+ (Nudity/Sex) or Uncensored Badges */}
+        {(movie.is_adult || (movie.certification && movie.certification.includes('18+'))) && (
+          <div className="absolute top-3 left-3 text-[10px] font-black text-rose-200 bg-rose-950/90 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-rose-500/60 shadow-md flex items-center gap-1">
+            <span>🔞</span>
+            <span>18+ Nudity/Sex</span>
           </div>
         )}
         {movie.censorship === 'uncensored' && (
-          <div className="absolute top-3 right-3 text-[10px] font-black text-amber-200 bg-amber-950/85 backdrop-blur-md px-2 py-0.5 rounded-lg border border-amber-500/50 shadow-md">
-            🎬 Uncut
+          <div className="absolute top-3 right-3 text-[10px] font-black text-amber-200 bg-amber-950/90 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-amber-500/60 shadow-md flex items-center gap-1">
+            <span>🎬</span>
+            <span>Uncut / Raw</span>
           </div>
         )}
 

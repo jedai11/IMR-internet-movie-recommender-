@@ -1,6 +1,45 @@
+import re
 from typing import List, Set, Tuple, Dict, Any
 from app.db.models import MovieTitle, ContentWarning
 from app.schemas.recommendation import FilterCriteria
+
+ADULT_KEYWORDS = {
+    "nudity", "nude", "sex", "sexual", "erotic", "erotica", "sensual", "explicit",
+    "unrated", "nc-17", "xxx", "lust", "seduction", "steamy", "provocative", "nsfw",
+    "adult", "softcore", "intercourse", "passion", "desire", "naked", "taboo"
+}
+
+def is_adult_content(movie: MovieTitle) -> bool:
+    """
+    Determines if a movie qualifies as 18+ adult content (nudity, sex, erotic, or mature).
+    """
+    if getattr(movie, "is_adult", 0) == 1:
+        return True
+
+    cert = (getattr(movie, "certification", "") or "").upper()
+    if cert in ("18+", "R", "NC-17", "A", "TV-MA", "XXX", "UNRATED"):
+        return True
+
+    # Content warnings check
+    warnings_present = {
+        cw.warning_code.lower() for cw in getattr(movie, "content_warnings", [])
+        if getattr(cw, "status", "").upper() == "PRESENT"
+    }
+    if any(w in warnings_present for w in ("sexual_violence", "nudity", "sex", "explicit_content")):
+        return True
+
+    # Genre check
+    genre_names = {g.name.lower() for g in getattr(movie, "genres", [])}
+    if any(g in genre_names for g in ("erotic", "erotica", "adult")):
+        return True
+
+    # Textual scan for sex, nudity, erotic themes
+    text_corpus = f"{getattr(movie, 'title', '')} {getattr(movie, 'synopsis', '')}".lower()
+    for kw in ADULT_KEYWORDS:
+        if re.search(r"\b" + re.escape(kw) + r"\b", text_corpus):
+            return True
+
+    return False
 
 def apply_hard_filters(
     candidates: List[MovieTitle],
@@ -118,17 +157,10 @@ def apply_hard_filters(
                 dropped_reasons["origin"] += 1
                 continue
 
-        # 5c. 18+ Adult / Maturity Filter
+        # 5c. 18+ Adult Content Filter (Nudity, Sex, Erotic, Explicit Cinema)
         # adult_mode: "standard" (family/PG-13 only), "include_18" / "all" (all ratings), "18_plus" (18+ mature only)
         adult_mode = (getattr(filters, "adult_mode", None) or "all").lower()
-        is_adult_movie = bool(getattr(movie, "is_adult", 0) == 1)
-        cert = (getattr(movie, "certification", "") or "").upper()
-        if not is_adult_movie and cert in ("18+", "R", "NC-17", "A", "TV-MA", "XXX"):
-            is_adult_movie = True
-        
-        warning_codes_present = {cw.warning_code.lower() for cw in movie.content_warnings if cw.status.upper() == "PRESENT"}
-        if "sexual_violence" in warning_codes_present or "substance_abuse" in warning_codes_present:
-            is_adult_movie = True
+        is_adult_movie = is_adult_content(movie)
 
         if adult_mode == "18_plus" and not is_adult_movie:
             dropped_reasons["adult_maturity"] = dropped_reasons.get("adult_maturity", 0) + 1

@@ -19,15 +19,15 @@ const CINEMA_ORIGINS = [
 ];
 
 const ADULT_OPTIONS = [
-  { code: 'standard', label: '🛡️ Family / Standard (PG-13)', desc: 'Exclude 18+ mature content' },
-  { code: 'all', label: '🌐 All Content (Include 18+)', desc: 'Show both standard and mature' },
-  { code: '18_plus', label: '🔞 18+ Mature Only', desc: 'Strictly mature / adult cinema' }
+  { code: 'standard', label: '🛡️ Family / Standard (PG-13)', desc: 'Clean cinema (No nudity or explicit sex)' },
+  { code: 'all', label: '🌐 All Content (Include 18+)', desc: 'Both standard and adult movies (nudity & sex included)' },
+  { code: '18_plus', label: '🔞 18+ Mature (Nudity & Sex)', desc: 'Strictly movies with nudity, sex, erotic & mature themes' }
 ];
 
 const CENSORSHIP_OPTIONS = [
   { code: 'all', label: '🎞️ All Versions', desc: 'Any release version' },
-  { code: 'censored', label: '✂️ Censored Edits', desc: 'Theatrical & broadcast cuts' },
-  { code: 'uncensored', label: '🎬 Uncensored / Uncut', desc: 'Director cut, unrated & raw' }
+  { code: 'censored', label: '✂️ Censored Edits', desc: 'Theatrical cuts with blurred/cut scenes' },
+  { code: 'uncensored', label: '🎬 Uncensored / Uncut', desc: 'Full explicit nudity, uncut sex & raw director\'s cuts' }
 ];
 
 const AVAILABLE_GENRES = [
@@ -104,10 +104,10 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
         <label className="text-xs font-bold text-[#F8FAFC] flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-amber-300">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-            18+ Maturity & Adult Cinema
+            18+ Adult Cinema (Nudity, Sex & Erotica)
           </span>
           <span className="glass-light-pill font-mono text-[10px] text-amber-200 font-bold px-2 py-0.5 rounded-lg border-[#29344D]">
-            {currentAdultMode === '18_plus' ? '🔞 18+ Only' : currentAdultMode === 'standard' ? '🛡️ Family' : '🌐 All Ratings'}
+            {currentAdultMode === '18_plus' ? '🔞 18+ Nudity/Sex' : currentAdultMode === 'standard' ? '🛡️ Family' : '🌐 All Ratings'}
           </span>
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
