@@ -1,2 +1,2 @@
-"""MoodReel Backend Package"""
+"""IMR (Internet Movie Recommender) Backend Package"""
 

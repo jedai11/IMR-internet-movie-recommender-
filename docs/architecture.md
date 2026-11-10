@@ -1,8 +1,8 @@
-# MoodReel System Architecture
+# IMR (Internet Movie Recommender) System Architecture
 
 ## 1. Architectural Overview
 
-MoodReel operates on a hybrid architecture combining deterministic psychological affect computing with bounded, schema-validated language model assistance.
+IMR (Internet Movie Recommender) operates on a hybrid architecture combining deterministic psychological affect computing with bounded, schema-validated language model assistance.
 
 ```mermaid
 flowchart TD

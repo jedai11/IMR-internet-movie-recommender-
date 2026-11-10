@@ -1,4 +1,4 @@
-# MoodReel — Repo Layout & Phase 1 Task List
+# IMR (Internet Movie Recommender) — Repo Layout & Phase 1 Task List
 
 > [!IMPORTANT]
 > This document is the **approval gate**. Reply "Proceed" or annotate any cell/section to redirect before build starts.
@@ -8,7 +8,7 @@
 ## Proposed Repo Layout
 
 ```
-moodreel/
+imr/
 ├── apps/
 │   └── web/                          # Next.js 14 PWA (App Router)
 │       ├── app/

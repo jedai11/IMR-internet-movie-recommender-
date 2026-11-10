@@ -4,14 +4,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DEFAULT_DB_PATH = os.path.join(BASE_DIR, "moodreel.db").replace("\\", "/")
+DEFAULT_DB_PATH = os.path.join(BASE_DIR, "imr.db").replace("\\", "/")
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "MoodReel API"
+    PROJECT_NAME: str = "IMR API"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api"
     
-    # Database (Canonical absolute path to backend/moodreel.db)
+    # Database (Canonical absolute path to backend/imr.db)
     DATABASE_URL: str = f"sqlite:///{DEFAULT_DB_PATH}"
     
     # CORS

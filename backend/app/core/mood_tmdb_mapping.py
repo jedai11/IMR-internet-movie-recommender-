@@ -29,6 +29,11 @@ ORIGIN_LANGUAGE_MAP: Dict[str, str] = {
     "korean": "ko",
     "japanese": "ja",
     "hollywood": "en",
+    "european": "en|fr|de|es|it",
+    "french": "fr",
+    "spanish": "es",
+    "german": "de",
+    "italian": "it",
     "asian": "hi|te|ta|ml|kn|ko|ja|zh|th"
 }
 
@@ -62,6 +67,19 @@ ORIGIN_SYNONYMS: Dict[str, str] = {
     "american": "hollywood",
     "english": "hollywood",
     "us": "hollywood",
+    # European
+    "european": "european",
+    "europe": "european",
+    "french": "french",
+    "france": "french",
+    "german": "german",
+    "germany": "german",
+    "spanish": "spanish",
+    "spain": "spanish",
+    "italian": "italian",
+    "italy": "italian",
+    "british": "hollywood",
+    "uk": "hollywood",
     # Asian / International
     "asian": "asian",
     "asia": "asian",
@@ -268,18 +286,29 @@ def get_origin_language_param(origin_keys: List[str]) -> Optional[str]:
 def get_tmdb_query_params(
     mood_key: str,
     page: int = 1,
-    origin_keys: Optional[List[str]] = None
+    origin_keys: Optional[List[str]] = None,
+    adult_mode: Optional[str] = "all",
+    censorship: Optional[str] = "all"
 ) -> Dict[str, Any]:
     """
-    Returns query parameters for TMDB's /discover/movie endpoint based on the mood key
-    and optional cinema origin keys (e.g. ['bollywood'], ['korean']).
+    Returns query parameters for TMDB's /discover/movie endpoint based on the mood key,
+    optional cinema origin keys (e.g. ['bollywood'], ['korean']), and adult/censorship modes.
     """
     config = MOOD_TMDB_MAPPING.get(mood_key, MOOD_TMDB_MAPPING["default"])
+    
+    # 18+ and adult content configuration
+    is_adult_enabled = "true" if adult_mode in ("18_plus", "include_18", "all") else "false"
+
     params: Dict[str, Any] = {
         "page": page,
-        "include_adult": "false",
+        "include_adult": is_adult_enabled,
         "include_video": "false"
     }
+
+    # If user explicitly requests 18+ only, adjust certification or genres if applicable
+    if adult_mode == "18_plus":
+        params["certification_country"] = "US"
+        params["certification.gte"] = "R"
 
     if config.get("with_genres"):
         params["with_genres"] = config["with_genres"]

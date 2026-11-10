@@ -193,10 +193,10 @@ export function App() {
 
   // Initialize Anonymous Session
   useEffect(() => {
-    let sid = localStorage.getItem('moodreel_session_id');
+    let sid = localStorage.getItem('imr_session_id') || localStorage.getItem('moodreel_session_id');
     if (!sid) {
       sid = `sess_anon_${Math.random().toString(36).substring(2, 9)}`;
-      localStorage.setItem('moodreel_session_id', sid);
+      localStorage.setItem('imr_session_id', sid);
     }
     setSessionId(sid);
   }, []);
@@ -384,9 +384,10 @@ export function App() {
 
   // Clear Session & History
   const handleClearSession = () => {
+    localStorage.removeItem('imr_session_id');
     localStorage.removeItem('moodreel_session_id');
     const newSid = `sess_anon_${Math.random().toString(36).substring(2, 9)}`;
-    localStorage.setItem('moodreel_session_id', newSid);
+    localStorage.setItem('imr_session_id', newSid);
     setSessionId(newSid);
     setRecommendations([]);
     setDistressData(null);

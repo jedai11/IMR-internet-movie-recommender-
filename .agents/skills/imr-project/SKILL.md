@@ -1,13 +1,13 @@
 ---
 name: imr-project
 description: >-
-  Expert knowledge base for the IMR (Internet Movie Recommender / MoodReel) project.
-  Activates automatically when working in D:\IMR-Forked. Covers architecture,
+  Expert knowledge base for the IMR (Internet Movie Recommender) project.
+  Activates automatically when working in the workspace. Covers architecture,
   dev workflows, git rules, testing, known bugs, and all file locations so the
   agent can work without asking for context every session.
 ---
 
-# IMR — Internet Movie Recommender (MoodReel) Project Skill
+# IMR — Internet Movie Recommender Project Skill
 
 > [!IMPORTANT]
 > This skill must be activated before making ANY change to this project.
@@ -19,7 +19,7 @@ description: >-
 
 | Field | Value |
 |---|---|
-| **App name** | MoodReel |
+| **App name** | IMR (Internet Movie Recommender) |
 | **Repo root** | `D:\IMR-Forked` |
 | **GitHub remote** | `https://github.com/jedai11/IMR-internet-movie-recommender-.git` |
 | **Active branch** | `IMR-forked` |
@@ -81,7 +81,7 @@ D:\IMR-Forked\
 │   │   ├── test_filters.py
 │   │   └── test_ranking.py
 │   ├── .venv/                          ← Python virtualenv
-│   ├── moodreel.db                     ← SQLite database
+│   ├── imr.db                          ← SQLite database
 │   ├── requirements.txt
 │   └── pytest.ini
 ├── frontend/
@@ -230,7 +230,7 @@ War: 10752     | Western: 37
 The frontend footer must always show:
 1. The official TMDB logo (`https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg`)
 2. This exact text: *"This product uses the TMDB API but is not endorsed or certified by TMDB."*
-3. TMDB logo must be visually less prominent than MoodReel branding.
+3. TMDB logo must be visually less prominent than IMR branding.
 
 ---
 
@@ -276,7 +276,7 @@ interface MovieRecommendation {
 
 | Issue | Fix Applied |
 |---|---|
-| `sqlite3.OperationalError: no such column: titles.origin` | Stale `moodreel.db`. Fix: delete both `moodreel.db` files, restart backend to recreate tables |
+| `sqlite3.OperationalError: no such column: titles.origin` | Stale `imr.db`. Fix: delete both `imr.db` files, restart backend to recreate tables |
 | `'concurrently' is not recognized` | Run `npm install` at repo root to install `concurrently` dev dependency |
 | TMDB discover returning 0 results for a mood | Comma-AND genre filter too restrictive → switch to pipe-OR in `mood_tmdb_mapping.py` |
 | `vote_average_gte` blocking all results | Remove `vote_average_gte` from that mood's config in `mood_tmdb_mapping.py` |
@@ -285,8 +285,8 @@ interface MovieRecommendation {
 
 ### Reset the Database (if schema mismatch)
 ```powershell
-Remove-Item "D:\IMR-Forked\backend\moodreel.db" -ErrorAction SilentlyContinue
-Remove-Item "D:\IMR-Forked\moodreel.db" -ErrorAction SilentlyContinue
+Remove-Item "D:\IMR-Forked\backend\imr.db" -ErrorAction SilentlyContinue
+Remove-Item "D:\IMR-Forked\imr.db" -ErrorAction SilentlyContinue
 # Restart backend — tables recreated automatically via Base.metadata.create_all()
 ```
 
@@ -298,7 +298,7 @@ Remove-Item "D:\IMR-Forked\moodreel.db" -ErrorAction SilentlyContinue
 # backend/.env  (never commit this file)
 TMDB_API_KEY=...
 GEMINI_API_KEY=...
-DATABASE_URL=sqlite:///./moodreel.db
+DATABASE_URL=sqlite:///./imr.db
 ```
 
 The `backend/app/core/config.py` reads these via Pydantic `BaseSettings`.

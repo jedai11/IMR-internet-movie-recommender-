@@ -36,6 +36,18 @@ export const MovieCard: React.FC<Props> = ({ movie }) => {
         {/* Subtle Ambient Vignette */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#080B16] via-transparent to-transparent pointer-events-none" />
 
+        {/* 18+ or Uncensored Badges */}
+        {(movie.is_adult || movie.certification === '18+') && (
+          <div className="absolute top-3 left-3 text-[10px] font-black text-rose-200 bg-rose-950/85 backdrop-blur-md px-2 py-0.5 rounded-lg border border-rose-500/50 shadow-md">
+            🔞 18+
+          </div>
+        )}
+        {movie.censorship === 'uncensored' && (
+          <div className="absolute top-3 right-3 text-[10px] font-black text-amber-200 bg-amber-950/85 backdrop-blur-md px-2 py-0.5 rounded-lg border border-amber-500/50 shadow-md">
+            🎬 Uncut
+          </div>
+        )}
+
         {/* Hover Hint to TMDB */}
         <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 glass-light-pill px-2.5 py-1 rounded-xl text-[11px] font-bold text-cyan-200 border-[#29344D] flex items-center gap-1 shadow-lg bg-[#080B16]/90">
           <span>TMDB</span>

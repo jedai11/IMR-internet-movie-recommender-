@@ -32,6 +32,9 @@ class MovieTitle(Base):
     ending_tone = Column(String, default="uplifting")
     popularity_score = Column(Float, default=7.5)
     origin = Column(String, default="Hollywood", index=True)
+    is_adult = Column(Integer, default=0, index=True)  # 0: standard/family, 1: 18+ mature
+    censorship = Column(String, default="censored", index=True)  # "censored" or "uncensored"
+    certification = Column(String, default="PG-13", nullable=True)  # e.g., "18+", "R", "PG-13", "A"
 
     # Relationships
     genres = relationship("Genre", secondary=title_genres_table, back_populates="titles")

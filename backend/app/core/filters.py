@@ -91,8 +91,62 @@ def apply_hard_filters(
         # 5b. Origin / Cinema Industry Filter (Hollywood, Bollywood, Tollywood, Korean, Japanese, European, etc.)
         if filter_by_origin:
             mov_origin = (getattr(movie, "origin", None) or "Hollywood").strip().lower()
-            if mov_origin not in requested_origins_lower:
+            matched_origin = False
+            for req in requested_origins_lower:
+                if req in mov_origin:
+                    matched_origin = True
+                    break
+                if req == "tollywood" and any(k in mov_origin for k in ("tollywood", "south", "telugu", "tamil", "malayalam", "kannada", "india")):
+                    matched_origin = True
+                    break
+                if req == "bollywood" and any(k in mov_origin for k in ("bollywood", "hindi", "india")):
+                    matched_origin = True
+                    break
+                if req == "hollywood" and any(k in mov_origin for k in ("hollywood", "us", "usa", "american")):
+                    matched_origin = True
+                    break
+                if req == "korean" and any(k in mov_origin for k in ("korea", "korean", "k-drama")):
+                    matched_origin = True
+                    break
+                if req == "japanese" and any(k in mov_origin for k in ("japan", "japanese", "anime")):
+                    matched_origin = True
+                    break
+                if req in ("european", "intl", "asian") and any(k in mov_origin for k in ("uk", "brit", "france", "french", "german", "spain", "italy", "euro", "asia")):
+                    matched_origin = True
+                    break
+            if not matched_origin:
                 dropped_reasons["origin"] += 1
+                continue
+
+        # 5c. 18+ Adult / Maturity Filter
+        # adult_mode: "standard" (family/PG-13 only), "include_18" / "all" (all ratings), "18_plus" (18+ mature only)
+        adult_mode = (getattr(filters, "adult_mode", None) or "all").lower()
+        is_adult_movie = bool(getattr(movie, "is_adult", 0) == 1)
+        cert = (getattr(movie, "certification", "") or "").upper()
+        if not is_adult_movie and cert in ("18+", "R", "NC-17", "A", "TV-MA", "XXX"):
+            is_adult_movie = True
+        
+        warning_codes_present = {cw.warning_code.lower() for cw in movie.content_warnings if cw.status.upper() == "PRESENT"}
+        if "sexual_violence" in warning_codes_present or "substance_abuse" in warning_codes_present:
+            is_adult_movie = True
+
+        if adult_mode == "18_plus" and not is_adult_movie:
+            dropped_reasons["adult_maturity"] = dropped_reasons.get("adult_maturity", 0) + 1
+            continue
+        elif adult_mode == "standard" and is_adult_movie:
+            dropped_reasons["adult_maturity"] = dropped_reasons.get("adult_maturity", 0) + 1
+            continue
+
+        # 5d. Censorship Filter ('all', 'censored', 'uncensored')
+        censorship_mode = (getattr(filters, "censorship", None) or "all").lower()
+        movie_censorship = (getattr(movie, "censorship", "") or "censored").lower()
+        if censorship_mode == "uncensored":
+            if movie_censorship != "uncensored" and not is_adult_movie:
+                dropped_reasons["censorship"] = dropped_reasons.get("censorship", 0) + 1
+                continue
+        elif censorship_mode == "censored":
+            if movie_censorship == "uncensored":
+                dropped_reasons["censorship"] = dropped_reasons.get("censorship", 0) + 1
                 continue
 
         # Survived all hard exclusion gates

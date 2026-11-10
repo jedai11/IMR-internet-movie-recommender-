@@ -1,7 +1,7 @@
 @echo off
-title IMR / MoodReel Launcher
+title IMR (Internet Movie Recommender) Launcher
 echo ===================================================
-echo           Starting IMR (MoodReel System)
+echo   Starting IMR (Internet Movie Recommender)
 echo ===================================================
 echo.
 

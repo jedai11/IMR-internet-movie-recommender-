@@ -1,5 +1,5 @@
 """
-Curated Seed Catalog for MoodReel.
+Curated Seed Catalog for IMR (Internet Movie Recommender).
 Expanded domain covering Korean cinema & K-dramas, Japanese cinema & J-dramas,
 Chinese cinema & C-dramas, and Hollywood / World live-action masterpieces.
 Carefully mapped into Russell's Circumplex Affective Space (Valence x Arousal).

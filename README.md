@@ -3,7 +3,7 @@
 > **One Stop For All Movie Lovers**  
 > *Affective Psychology • TMDB On-Demand Ingestion • FIFO Queue & LIFO Stack Caching • Circumplex Mood Modeling • Zero Hallucinations*
 
-**IMR (Internet Movie Recommender)**, powered by the **MoodReel** engine, is an intelligent cinematic discovery platform that maps natural-language emotional reflections and explicit 2D mood coordinates into formal psychological affect space (**Russell’s Circumplex Model of Affect: Valence $\times$ Arousal**). It pairs psychological states with rich, verified metadata dynamically abstracted from **The Movie Database (TMDB)**.
+**IMR (Internet Movie Recommender)** is an intelligent cinematic discovery platform that maps natural-language emotional reflections and explicit 2D mood coordinates into formal psychological affect space (**Russell’s Circumplex Model of Affect: Valence $\times$ Arousal**). It pairs psychological states with rich, verified metadata dynamically abstracted from **The Movie Database (TMDB)**.
 
 Using an on-demand **FIFO Queue $\to$ Persistent SQLite $\to$ LIFO Stack** architecture, IMR streams and caches movie data, theatrical one-sheet posters, backdrop imagery, live TMDB ratings, cast/director metadata, and official YouTube trailers—guaranteeing high-speed retrieval with zero redundant external API calls.
 
@@ -38,7 +38,10 @@ Using an on-demand **FIFO Queue $\to$ Persistent SQLite $\to$ LIFO Stack** archi
 - **Cognitive Intent Extraction:** Powered by Google Gemini NLU to parse unstructured text into 2D affect coordinates (Valence $v \in [-1.0, 1.0]$, Arousal $a \in [-1.0, 1.0]$) alongside extracted genre desires.
 - **On-Demand TMDB Dynamic Abstraction:** Movies are abstracted dynamically per requested genre through a FIFO ingestion queue into local storage, eliminating redundant external API queries.
 - **High-Throughput LIFO Retrieval Stack:** Automatically tracks session genre explorations and pushes recommendations onto an in-memory/DB LIFO stack for immediate traversal.
-- **Interactive Clickable Movie Cards:** Cards display theatrical one-sheet posters, match fit percentages, origin badges, runtimes, release years, and live TMDB rating badges (e.g., ⭐ `8.4` TMDB). Clicking any card opens a full transparency modal.
+- **Interactive Clickable Movie Cards:** Cards display theatrical one-sheet posters, match fit percentages, origin badges, runtimes, release years, 18+ maturity badges, and live TMDB rating badges (e.g., ⭐ `8.4` TMDB). Clicking any card opens a full transparency modal.
+- **18+ Maturity & Adult Cinema Filter:** Switch seamlessly between *Family / Standard (PG-13)*, *All Content (Include 18+)*, or *18+ Mature Only* to control adult themes and age-gated cinema.
+- **Censorship & Version Control:** Choose between *All Versions*, *Censored (Theatrical / Broadcast Edits)*, and *Uncensored (Raw / Director's Cut / Unrated)*.
+- **Global Origin & Cinema Industry Engine:** Directly filter recommendations across *Hollywood (US)*, *Bollywood (Hindi)*, *Tollywood (South Indian: Telugu, Tamil, Malayalam, Kannada)*, *Korean (K-Cinema)*, *Japanese (J-Cinema & Anime)*, *European Cinema*, or *All World Cinema*.
 - **Deep Transparency Modal ("Why this recommendation?"):** Provides mathematical explainability showing Russell's affective coordinates, Euclidean distance calculations, Gemini-generated rationale narratives, official YouTube trailers, and filter verification audits.
 - **Dual Emotional Strategies (Catharsis vs. Shift Mode):**
   - *Catharsis Mode:* Meets users exactly where they are, validating current emotional states ($\vec{M}_{\text{target}} = \vec{M}_{\text{user}}$).
@@ -83,7 +86,7 @@ flowchart TD
     end
 
     subgraph StorageLayer["5. Persistence & Local Storage"]
-        DB[(SQLite Database\nmoodreel.db)]
+        DB[(SQLite Database\nimr.db)]
         PosterCache[(Local Poster & Backdrop Cache\nbackend/app/poster_cache/)]
         EventLog[(Audit & Telemetry Table\nevents)]
     end
@@ -217,7 +220,7 @@ The user interface automatically adapts its luminous glassmorphic palette accord
 
 ## Compliance & Privacy by Design
 
-- **Sensor-Free Architecture:** MoodReel does **not** access webcams, facial emotion recognition (FER) models, microphones, or biometric trackers. All emotional inputs are voluntary and explicit.
+- **Sensor-Free Architecture:** IMR does **not** access webcams, facial emotion recognition (FER) models, microphones, or biometric trackers. All emotional inputs are voluntary and explicit.
 - **Strict One-Way Pipeline:** The LLM interprets only user prompts and generates rationale text. It is never fed user listening/viewing history for persistent profiling.
 - **Pseudonymous Sessions:** User identity is represented by random client-generated session keys (`sess_anon_...`). No account creation, email address, or personally identifiable information (PII) is ever collected.
 - **1-Click Local Data Erasure:** Users can erase all session history, mood coordinates, and interaction logs at any time from the Consent & Transparency Center.

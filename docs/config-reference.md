@@ -1,11 +1,11 @@
-# MoodReel Configuration Reference
+# IMR (Internet Movie Recommender) Configuration Reference
 
 All settings are configured via `backend/app/core/config.py` and overrideable via environment variables (`.env`).
 
 | Variable | Default | Purpose & Rationale |
 |---|---|---|
-| `PROJECT_NAME` | `"MoodReel API"` | Application identifier in OpenAPI and logs |
-| `DATABASE_URL` | `"sqlite:///./moodreel.db"` | SQLite database connection for zero-dependency local runs |
+| `PROJECT_NAME` | `"IMR API"` | Application identifier in OpenAPI and logs |
+| `DATABASE_URL` | `"sqlite:///./imr.db"` | SQLite database connection for zero-dependency local runs |
 | `GEMINI_API_KEY` | `None` | Optional Google Gemini API key for external LLM inference |
 | `OPENAI_API_KEY` | `None` | Optional OpenAI key |
 | `LLM_PROVIDER` | `"auto"` | Selection between `'auto'`, `'gemini'`, `'openai'`, or `'heuristic'` |

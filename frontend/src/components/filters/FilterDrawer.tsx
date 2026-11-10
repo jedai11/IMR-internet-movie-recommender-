@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, Clock, Film, Tv, Globe } from 'lucide-react';
+import { Filter, Clock, Film, Tv, Globe, Shield, AlertTriangle, Sparkles } from 'lucide-react';
 import { FilterCriteria } from '../../types';
 
 interface Props {
@@ -9,12 +9,25 @@ interface Props {
 
 const CINEMA_ORIGINS = [
   { code: 'all', label: '🌐 All Origins' },
-  { code: 'hollywood', label: '🎬 Hollywood' },
+  { code: 'hollywood', label: '🎬 Hollywood (US)' },
   { code: 'bollywood', label: '🇮🇳 Bollywood' },
   { code: 'tollywood', label: '⚡ Tollywood (South)' },
   { code: 'korean', label: '🇰🇷 Korean' },
   { code: 'japanese', label: '🇯🇵 Japanese & Anime' },
+  { code: 'european', label: '🇪🇺 European' },
   { code: 'asian', label: '🌏 Asian / Intl' }
+];
+
+const ADULT_OPTIONS = [
+  { code: 'standard', label: '🛡️ Family / Standard (PG-13)', desc: 'Exclude 18+ mature content' },
+  { code: 'all', label: '🌐 All Content (Include 18+)', desc: 'Show both standard and mature' },
+  { code: '18_plus', label: '🔞 18+ Mature Only', desc: 'Strictly mature / adult cinema' }
+];
+
+const CENSORSHIP_OPTIONS = [
+  { code: 'all', label: '🎞️ All Versions', desc: 'Any release version' },
+  { code: 'censored', label: '✂️ Censored Edits', desc: 'Theatrical & broadcast cuts' },
+  { code: 'uncensored', label: '🎬 Uncensored / Uncut', desc: 'Director cut, unrated & raw' }
 ];
 
 const AVAILABLE_GENRES = [
@@ -61,21 +74,131 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
     onChange({ ...filters, origins: next });
   };
 
+  const setAdultMode = (mode: 'standard' | 'all' | '18_plus') => {
+    onChange({ ...filters, adult_mode: mode });
+  };
+
+  const setCensorship = (mode: 'all' | 'censored' | 'uncensored') => {
+    onChange({ ...filters, censorship: mode });
+  };
+
+  const currentAdultMode = filters.adult_mode || 'all';
+  const currentCensorship = filters.censorship || 'all';
+
   return (
     <div className="glass-light-panel rounded-3xl p-6 sm:p-7 space-y-6 border-[#29344D]">
       <div className="flex items-center justify-between border-b border-[#29344D] pb-3.5">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-cyan-400" />
           <h3 className="text-sm font-black text-[#F8FAFC] tracking-tight">
-            Hard Exclusion & Preference Engine
+            Discovery & Exclusion Filters
           </h3>
         </div>
         <span className="glass-light-pill text-[11px] font-bold text-cyan-300 px-3 py-1 rounded-full border-[#29344D]">
-          Grounded Catalog
+          IMR Verified
         </span>
       </div>
 
-      {/* 1. Runtime Cap */}
+      {/* 1. 18+ Mature & Adult Content Filter */}
+      <div className="space-y-3 p-4 rounded-2xl glass-light-inner border border-amber-500/20 bg-amber-950/10">
+        <label className="text-xs font-bold text-[#F8FAFC] flex items-center justify-between">
+          <span className="flex items-center gap-1.5 text-amber-300">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+            18+ Maturity & Adult Cinema
+          </span>
+          <span className="glass-light-pill font-mono text-[10px] text-amber-200 font-bold px-2 py-0.5 rounded-lg border-[#29344D]">
+            {currentAdultMode === '18_plus' ? '🔞 18+ Only' : currentAdultMode === 'standard' ? '🛡️ Family' : '🌐 All Ratings'}
+          </span>
+        </label>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {ADULT_OPTIONS.map((opt) => {
+            const isSelected = currentAdultMode === opt.code;
+            return (
+              <button
+                key={opt.code}
+                onClick={() => setAdultMode(opt.code as any)}
+                className={`p-3 rounded-2xl text-left transition cursor-pointer border flex flex-col justify-between gap-1 ${
+                  isSelected
+                    ? 'border-amber-400 bg-amber-950/40 text-amber-200 shadow-sm'
+                    : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D]'
+                }`}
+              >
+                <span className="text-xs font-black">{opt.label}</span>
+                <span className="text-[10px] text-[#CBD5E1]/70 leading-tight">{opt.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Censorship Setting: Censored vs Uncensored */}
+      <div className="space-y-3 p-4 rounded-2xl glass-light-inner border border-cyan-500/20 bg-cyan-950/10">
+        <label className="text-xs font-bold text-[#F8FAFC] flex items-center justify-between">
+          <span className="flex items-center gap-1.5 text-cyan-300">
+            <Shield className="w-3.5 h-3.5 text-cyan-400" />
+            Censorship & Version Preference
+          </span>
+          <span className="glass-light-pill font-mono text-[10px] text-cyan-200 font-bold px-2 py-0.5 rounded-lg border-[#29344D]">
+            {currentCensorship === 'uncensored' ? '🎬 Uncut' : currentCensorship === 'censored' ? '✂️ Censored' : '🎞️ All'}
+          </span>
+        </label>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {CENSORSHIP_OPTIONS.map((opt) => {
+            const isSelected = currentCensorship === opt.code;
+            return (
+              <button
+                key={opt.code}
+                onClick={() => setCensorship(opt.code as any)}
+                className={`p-3 rounded-2xl text-left transition cursor-pointer border flex flex-col justify-between gap-1 ${
+                  isSelected
+                    ? 'border-cyan-400 bg-cyan-950/40 text-cyan-200 shadow-sm'
+                    : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D]'
+                }`}
+              >
+                <span className="text-xs font-black">{opt.label}</span>
+                <span className="text-[10px] text-[#CBD5E1]/70 leading-tight">{opt.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Movie Origin / Cinema Industry */}
+      <div className="space-y-3">
+        <label className="text-xs font-bold text-[#F8FAFC] flex items-center justify-between">
+          <span className="flex items-center gap-1.5">
+            <Globe className="w-3.5 h-3.5 text-cyan-400" />
+            Cinema Origin & Industry
+          </span>
+          <span className="text-[10px] text-[#CBD5E1]/70 font-semibold">
+            {(!filters.origins || filters.origins.length === 0) ? 'All World Cinema' : `${filters.origins.length} Selected`}
+          </span>
+        </label>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {CINEMA_ORIGINS.map((orig) => {
+            const isAll = orig.code === 'all';
+            const isSelected = isAll
+              ? !filters.origins || filters.origins.length === 0
+              : (filters.origins || []).includes(orig.code);
+
+            return (
+              <button
+                key={orig.code}
+                onClick={() => toggleOrigin(orig.code)}
+                className={`p-2.5 rounded-2xl text-xs transition cursor-pointer font-bold border flex items-center justify-center gap-1.5 ${
+                  isSelected
+                    ? 'glass-light-pill-active border-cyan-400 text-cyan-300 shadow-sm'
+                    : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D]'
+                }`}
+              >
+                <span>{orig.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. Runtime Cap */}
       <div className="space-y-2.5">
         <label className="text-xs font-bold text-[#F8FAFC] flex items-center justify-between">
           <span className="flex items-center gap-1.5">
@@ -105,7 +228,7 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
         </div>
       </div>
 
-      {/* 2. Genre Exclusions */}
+      {/* 5. Genre Exclusions */}
       <div className="space-y-3">
         <label className="text-xs font-bold text-[#F8FAFC] flex items-center gap-1.5">
           <Film className="w-3.5 h-3.5 text-[#CBD5E1]" />
@@ -131,42 +254,7 @@ export const FilterDrawer: React.FC<Props> = ({ filters, onChange }) => {
         </div>
       </div>
 
-      {/* 4. Movie Origin / Cinema Industry */}
-      <div className="space-y-3">
-        <label className="text-xs font-bold text-[#F8FAFC] flex items-center justify-between">
-          <span className="flex items-center gap-1.5">
-            <Globe className="w-3.5 h-3.5 text-cyan-400" />
-            Origin & Cinema Industry
-          </span>
-          <span className="text-[10px] text-[#CBD5E1]/70 font-semibold">
-            {(!filters.origins || filters.origins.length === 0) ? 'All World Cinema' : `${filters.origins.length} Selected`}
-          </span>
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {CINEMA_ORIGINS.map((orig) => {
-            const isAll = orig.code === 'all';
-            const isSelected = isAll
-              ? !filters.origins || filters.origins.length === 0
-              : (filters.origins || []).includes(orig.code);
-
-            return (
-              <button
-                key={orig.code}
-                onClick={() => toggleOrigin(orig.code)}
-                className={`p-2.5 rounded-2xl text-xs transition cursor-pointer font-bold border flex items-center justify-center gap-1.5 ${
-                  isSelected
-                    ? 'glass-light-pill-active border-cyan-400 text-cyan-300 shadow-sm'
-                    : 'glass-light-pill text-[#CBD5E1] hover:text-[#F8FAFC] border-[#29344D]'
-                }`}
-              >
-                <span>{orig.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 5. Streaming Availability */}
+      {/* 6. Streaming Availability */}
       <div className="space-y-3">
         <label className="text-xs font-bold text-[#F8FAFC] flex items-center gap-1.5">
           <Tv className="w-3.5 h-3.5 text-[#CBD5E1]" />

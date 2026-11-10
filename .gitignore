@@ -22,7 +22,7 @@ ENV/
 *.db
 *.sqlite
 *.sqlite3
-moodreel.db
+imr.db
 
 # Logs and debug files
 *.log
