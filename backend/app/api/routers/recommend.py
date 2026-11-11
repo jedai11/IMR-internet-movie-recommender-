@@ -63,9 +63,6 @@ def get_recommendations(
     origin_keys = resolve_origin_keys(origins=raw_origins, text=origin_text)
     origin_display = ", ".join([k.capitalize() for k in origin_keys]) if origin_keys else "TMDB"
 
-    adult_mode = getattr(request.filters, "adult_mode", "all") if request.filters else "all"
-    censorship = getattr(request.filters, "censorship", "all") if request.filters else "all"
-
     limit = request.limit or 36
 
     # 2. Fetch recommendations from Mood Cache Service
@@ -73,8 +70,6 @@ def get_recommendations(
         mood_key=mood_key,
         db=db,
         origin_keys=origin_keys,
-        adult_mode=adult_mode,
-        censorship=censorship,
         force_refresh=False,
         limit=limit
     )
@@ -83,7 +78,6 @@ def get_recommendations(
 
     if cached_movies:
         for idx, item in enumerate(cached_movies):
-            is_18_plus = (adult_mode == "18_plus") or bool(item.get("is_adult"))
             rec = MovieRecommendation(
                 title_id=item["title_id"],
                 tmdb_id=item["tmdb_id"],
@@ -97,9 +91,6 @@ def get_recommendations(
                 tmdb_url=item.get("tmdb_url"),
                 score=round(1.0 - (idx * 0.02), 2),
                 match_rationale=f"Discovered for your {mood_key} mood from TMDB ({item.get('origin') or origin_display}).",
-                is_adult=is_18_plus,
-                censorship="uncensored" if censorship == "uncensored" else "censored",
-                certification="18+" if is_18_plus else ("PG-13" if adult_mode != "standard" else "PG"),
                 mood_compatibility=MoodCompatibility(
                     title_valence=v if v is not None else 0.0,
                     title_arousal=a if a is not None else 0.0,

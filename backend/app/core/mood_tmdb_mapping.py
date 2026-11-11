@@ -286,29 +286,18 @@ def get_origin_language_param(origin_keys: List[str]) -> Optional[str]:
 def get_tmdb_query_params(
     mood_key: str,
     page: int = 1,
-    origin_keys: Optional[List[str]] = None,
-    adult_mode: Optional[str] = "all",
-    censorship: Optional[str] = "all"
+    origin_keys: Optional[List[str]] = None
 ) -> Dict[str, Any]:
     """
-    Returns query parameters for TMDB's /discover/movie endpoint based on the mood key,
-    optional cinema origin keys (e.g. ['bollywood'], ['korean']), and adult/censorship modes.
+    Returns query parameters for TMDB's /discover/movie endpoint based on the mood key
+    and optional cinema origin keys (e.g. ['bollywood'], ['korean']).
     """
     config = MOOD_TMDB_MAPPING.get(mood_key, MOOD_TMDB_MAPPING["default"])
-    
-    # 18+ and adult content configuration
-    is_adult_enabled = "true" if adult_mode in ("18_plus", "include_18", "all") else "false"
-
     params: Dict[str, Any] = {
         "page": page,
-        "include_adult": is_adult_enabled,
+        "include_adult": "false",
         "include_video": "false"
     }
-
-    # If user explicitly requests 18+ only, adjust certification or genres if applicable
-    if adult_mode == "18_plus":
-        params["certification_country"] = "US"
-        params["certification.gte"] = "R"
 
     if config.get("with_genres"):
         params["with_genres"] = config["with_genres"]

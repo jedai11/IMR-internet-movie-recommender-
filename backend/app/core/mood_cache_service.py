@@ -63,8 +63,6 @@ class MoodCacheService:
         db: Session,
         max_pages: int = 3,
         origin_keys: Optional[List[str]] = None,
-        adult_mode: Optional[str] = "all",
-        censorship: Optional[str] = "all",
         cache_key: Optional[str] = None
     ) -> List[MoodMovieCache]:
         """
@@ -75,17 +73,11 @@ class MoodCacheService:
         storage_key = cache_key or mood_key
         logger.info(
             f"[MoodCache] Concurrently fetching {max_pages} discover pages from TMDB for key '{storage_key}' "
-            f"(mood='{mood_key}', origins={origin_keys}, adult={adult_mode}, censorship={censorship})..."
+            f"(mood='{mood_key}', origins={origin_keys})..."
         )
 
         def fetch_single_page(p: int):
-            params = get_tmdb_query_params(
-                mood_key,
-                page=p,
-                origin_keys=origin_keys,
-                adult_mode=adult_mode,
-                censorship=censorship
-            )
+            params = get_tmdb_query_params(mood_key, page=p, origin_keys=origin_keys)
             data = tmdb_service._execute_api_request("discover/movie", params)
             return p, data
 
@@ -150,14 +142,12 @@ class MoodCacheService:
         mood_key: str,
         db: Session,
         origin_keys: Optional[List[str]] = None,
-        adult_mode: Optional[str] = "all",
-        censorship: Optional[str] = "all",
         force_refresh: bool = False,
         limit: int = 36
     ) -> List[Dict[str, Any]]:
         """
         Primary Discovery Accessor:
-        1. Resolves composite storage key (e.g. 'joyful:bollywood:adult_18_plus').
+        1. Resolves composite storage key (e.g. 'joyful:bollywood' or 'joyful').
         2. Checks database for mood's stored results.
         3. If found, unexpired, and has sufficient results for requested limit, returns immediately (0 TMDB calls).
         4. If missing/expired/insufficient, acquires lock to fetch up to 3 pages (~60 movies).
@@ -167,17 +157,7 @@ class MoodCacheService:
         """
         clean_key = mood_key.strip().lower()
         canonical_origins = sorted(list(set(origin_keys))) if origin_keys else []
-        
-        # Build composite storage key
-        key_parts = [clean_key]
-        if canonical_origins:
-            key_parts.append('+'.join(canonical_origins))
-        if adult_mode and adult_mode != "all":
-            key_parts.append(f"adult_{adult_mode}")
-        if censorship and censorship != "all":
-            key_parts.append(f"censor_{censorship}")
-        storage_key = ":".join(key_parts)
-
+        storage_key = f"{clean_key}:{'+'.join(canonical_origins)}" if canonical_origins else clean_key
         origin_label = ", ".join([k.capitalize() for k in canonical_origins]) if canonical_origins else "TMDB"
 
         # Step 1: Check database (Cache Hit path - 0 TMDB calls)
@@ -204,8 +184,6 @@ class MoodCacheService:
                     db=db,
                     max_pages=3,
                     origin_keys=canonical_origins,
-                    adult_mode=adult_mode,
-                    censorship=censorship,
                     cache_key=storage_key
                 )
                 if new_records:

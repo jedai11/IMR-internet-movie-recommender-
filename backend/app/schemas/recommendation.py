@@ -8,8 +8,6 @@ class FilterCriteria(BaseModel):
     excluded_genres: List[str] = Field(default_factory=list)
     preferred_genres: List[str] = Field(default_factory=list, description="Preferred genres extracted semantically or explicitly selected")
     origins: List[str] = Field(default_factory=list, description="Origins or cinema industries requested: hollywood, bollywood, tollywood, korean, japanese, etc.")
-    adult_mode: Optional[str] = Field(default="all", description="Maturity setting: 'standard' (family/PG-13 only), 'all' (all ratings), or '18_plus' (mature/adult only)")
-    censorship: Optional[str] = Field(default="all", description="Censorship setting: 'all', 'censored' (theatrical/clean edits), or 'uncensored' (raw/director's cut)")
     # trigger codes: 'self_harm', 'sexual_violence', 'substance_abuse', 'grief_loss', 'panic_attacks', 'violence'
     excluded_warnings: List[str] = Field(default_factory=list)
     streaming_providers: List[str] = Field(default_factory=list) # e.g. ['netflix', 'prime', 'free']
@@ -55,9 +53,6 @@ class MovieRecommendation(BaseModel):
     tmdb_rating: Optional[float] = Field(default=None, description="Official TMDB user rating out of 10")
     vote_count: Optional[int] = Field(default=None, description="TMDB vote count")
     trailer_url: Optional[str] = Field(default=None, description="Official YouTube trailer URL")
-    is_adult: Optional[bool] = Field(default=False, description="Whether title is an 18+ mature film")
-    censorship: Optional[str] = Field(default="censored", description="Censorship version: 'censored' or 'uncensored'")
-    certification: Optional[str] = Field(default=None, description="Film certification (e.g., '18+', 'R', 'PG-13', 'A')")
 
 class RecommendationResponse(BaseModel):
     session_id: str

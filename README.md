@@ -38,9 +38,7 @@ Using an on-demand **FIFO Queue $\to$ Persistent SQLite $\to$ LIFO Stack** archi
 - **Cognitive Intent Extraction:** Powered by Google Gemini NLU to parse unstructured text into 2D affect coordinates (Valence $v \in [-1.0, 1.0]$, Arousal $a \in [-1.0, 1.0]$) alongside extracted genre desires.
 - **On-Demand TMDB Dynamic Abstraction:** Movies are abstracted dynamically per requested genre through a FIFO ingestion queue into local storage, eliminating redundant external API queries.
 - **High-Throughput LIFO Retrieval Stack:** Automatically tracks session genre explorations and pushes recommendations onto an in-memory/DB LIFO stack for immediate traversal.
-- **Interactive Clickable Movie Cards:** Cards display theatrical one-sheet posters, match fit percentages, origin badges, runtimes, release years, 18+ maturity badges, and live TMDB rating badges (e.g., ⭐ `8.4` TMDB). Clicking any card opens a full transparency modal.
-- **18+ Maturity & Adult Cinema Filter:** Switch seamlessly between *Family / Standard (PG-13)*, *All Content (Include 18+)*, or *18+ Mature Only* to control adult themes and age-gated cinema.
-- **Censorship & Version Control:** Choose between *All Versions*, *Censored (Theatrical / Broadcast Edits)*, and *Uncensored (Raw / Director's Cut / Unrated)*.
+- **Interactive Clickable Movie Cards:** Cards display theatrical one-sheet posters, match fit percentages, origin badges, runtimes, release years, and live TMDB rating badges (e.g., ⭐ `8.4` TMDB). Clicking any card opens a full transparency modal.
 - **Global Origin & Cinema Industry Engine:** Directly filter recommendations across *Hollywood (US)*, *Bollywood (Hindi)*, *Tollywood (South Indian: Telugu, Tamil, Malayalam, Kannada)*, *Korean (K-Cinema)*, *Japanese (J-Cinema & Anime)*, *European Cinema*, or *All World Cinema*.
 - **Deep Transparency Modal ("Why this recommendation?"):** Provides mathematical explainability showing Russell's affective coordinates, Euclidean distance calculations, Gemini-generated rationale narratives, official YouTube trailers, and filter verification audits.
 - **Dual Emotional Strategies (Catharsis vs. Shift Mode):**

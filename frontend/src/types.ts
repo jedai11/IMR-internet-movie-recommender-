@@ -52,8 +52,6 @@ export interface FilterCriteria {
   excluded_warnings: string[];
   streaming_providers: string[];
   exclude_seen: boolean;
-  adult_mode?: 'standard' | 'all' | '18_plus';
-  censorship?: 'all' | 'censored' | 'uncensored';
 }
 
 export interface MoodCompatibility {
@@ -90,9 +88,6 @@ export interface MovieRecommendation {
   tmdb_rating?: number;
   vote_count?: number;
   trailer_url?: string;
-  is_adult?: boolean;
-  censorship?: 'censored' | 'uncensored';
-  certification?: string;
 }
 
 export interface RecommendationResponse {
